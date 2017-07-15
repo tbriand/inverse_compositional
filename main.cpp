@@ -24,6 +24,7 @@
 #define PAR_DEFAULT_LAMBDA 0.0
 #define PAR_DEFAULT_VERBOSE 0
 #define PAR_DEFAULT_OUTFILE "transform.mat"
+#define PAR_DEFAULT_FIRST_SCALE 0
 
 /**
  *
@@ -83,7 +84,8 @@ int read_parameters(
     int    &nparams,
     int    &robust,
     double &lambda,
-    int    &verbose
+    int    &verbose,
+    int    &first_scale
 )
 {
   if (argc < 3){
@@ -103,7 +105,8 @@ int read_parameters(
     nparams=PAR_DEFAULT_TYPE; 
     robust =PAR_DEFAULT_ROBUST; 
     lambda =PAR_DEFAULT_LAMBDA; 
-    verbose=PAR_DEFAULT_VERBOSE; 
+    verbose=PAR_DEFAULT_VERBOSE;
+    first_scale=PAR_DEFAULT_FIRST_SCALE;
 
     //read each parameter from the command line
     while(i<argc)
@@ -135,6 +138,10 @@ int read_parameters(
       if(strcmp(argv[i],"-l")==0)
         if(i<argc-1)
           lambda=atof(argv[++i]);
+        
+      if(strcmp(argv[i],"-s")==0)
+        if(i<argc-1)
+          first_scale=atoi(argv[++i]);  
 
       if(strcmp(argv[i],"-v")==0)
         verbose=1;
@@ -179,13 +186,13 @@ int main (int argc, char *argv[])
 {
   //parameters of the method
   char  *image1, *image2, outfile[200];
-  int    nscales, nparams, robust, verbose;
+  int    nscales, nparams, robust, verbose, first_scale;
   double zfactor, TOL, lambda;
 
   //read the parameters from the console
   int result=read_parameters(
         argc, argv, &image1, &image2, outfile, nscales, 
-        zfactor, TOL, nparams, robust, lambda, verbose
+        zfactor, TOL, nparams, robust, lambda, verbose, first_scale
       );
   
   if(result)
@@ -219,7 +226,7 @@ int main (int argc, char *argv[])
       const clock_t begin = clock();
       pyramidal_inverse_compositional_algorithm(
         I1, I2, p, nparams, nx, ny, nz, 
-        nscales, zfactor, TOL, robust, lambda, verbose
+        nscales, zfactor, TOL, robust, lambda, verbose, first_scale
       );
       
       if(verbose) 

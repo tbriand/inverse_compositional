@@ -23,7 +23,7 @@
 **/
 
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 
 #include "bicubic_interpolation.h"
@@ -33,6 +33,10 @@
 #include "transformation.h"
 #include "zoom.h"
 
+#include "smapa.h"
+// use with EDGEPADDING()
+// change in terminal with EDGEPADDING=7 ./main blabla
+SMART_PARAMETER(EDGEPADDING,5)
 
 /**
  *
@@ -153,8 +157,10 @@ void hessian
 
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++)
-      sAtA(rho[i*nx+j], &(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
+    for(int j=0; j<nx; j++) {
+      if ( std::isfinite(rho[i*nx+j]) ) 
+        sAtA(rho[i*nx+j], &(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
+    }
 }
 
 
@@ -213,14 +219,21 @@ void robust_error_function
   int nz        //number of channels
 ) 
 {
-  for(int i=0;i<ny;i++)
+  for(int i=0;i<ny;i++) {
     for(int j=0;j<nx;j++)
     {
       double norm=0.0;
       for(int c=0;c<nz;c++)
         norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
       rho[i*nx+j]=rhop(norm,lambda,type);
+
+      if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN;
+
+      if ( i < EDGEPADDING() || i >= ny-1-EDGEPADDING() || j < EDGEPADDING() || j >= nx - 1 - EDGEPADDING()) {
+        rho[i*nx+j] = NAN;
+      }
     }
+  }
 }
 
 
@@ -280,6 +293,7 @@ void independent_vector
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
     {
+      if ( std::isfinite(rho[i*nx+j]) )
       sAtb(
         rho[i*nx+j], &(DIJ[(i*nx+j)*nparams*nz]), 
         &(DI[(i*nx+j)*nz]), b, nz, nparams
@@ -530,7 +544,8 @@ void pyramidal_inverse_compositional_algorithm(
     double TOL,     //stopping criterion threshold
     int    robust,  //robust error function
     double lambda,  //parameter of robust error function
-    bool   verbose  //switch on messages
+    bool   verbose,  //switch on messages
+    int first_scale // TEST number of the first scale
 )
 {
     int size=nxx*nyy*nzz;
@@ -580,7 +595,8 @@ void pyramidal_inverse_compositional_algorithm(
     }  
 
     //pyramidal approach for computing the transformation
-    for(int s=nscales-1; s>=0; s--)
+    //TEST for(int s=nscales-1; s>=0; s--)
+    for(int s=nscales-1; s>= first_scale; s--)
     {
       if(verbose) printf("Scale: %d ",s);
 

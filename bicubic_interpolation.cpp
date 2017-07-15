@@ -10,6 +10,11 @@
 
 #include "bicubic_interpolation.h"
 #include "transformation.h"
+#include <cmath> 
+#include <stdio.h>
+#include <stdlib.h>
+#include "smapa.h"
+SMART_PARAMETER(NANIFOUTSIDE,1)
 
 /**
   *
@@ -103,8 +108,10 @@ bicubic_interpolation(
   ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
   ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
 
-  if (out && border_out) 
-    return 0;
+  if (out && border_out) {
+    if (NANIFOUTSIDE()) return NAN;
+    else return 0;
+  }
   else
     {
       //obtain the interpolation points of the image

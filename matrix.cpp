@@ -36,6 +36,7 @@ void Atb(double *A, double *b, double *p, int n, int m)
 //p should be initialized to zero outside
 void sAtb(double s, double *A, double *b, double *p, int n, int m)
 {
+  //if ( isfinite(s) ) 
   for(int i=0; i<m; i++)
     for(int j=0; j<n; j++)
       p[i]+=s*A[j*m+i]*b[j];

@@ -1,0 +1,5 @@
+*.o
+
+add_noise
+generate_output
+inverse_compositional_algorithm
