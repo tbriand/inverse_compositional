@@ -37,6 +37,7 @@
 // use with EDGEPADDING()
 // change in terminal with EDGEPADDING=7 ./main blabla
 SMART_PARAMETER(EDGEPADDING,5)
+SMART_PARAMETER(NORMALIZATION,1)
 
 /**
  *
@@ -129,8 +130,10 @@ void hessian
  
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++)
-      AtA(&(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
+    for(int j=0; j<nx; j++) {
+        if ( std::isfinite(DIJ[(i*nx+j)*nz*nparams]) )
+          AtA(&(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
+    }
 }
 
 
@@ -222,15 +225,16 @@ void robust_error_function
   for(int i=0;i<ny;i++) {
     for(int j=0;j<nx;j++)
     {
-      double norm=0.0;
-      for(int c=0;c<nz;c++)
-        norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
-      rho[i*nx+j]=rhop(norm,lambda,type);
-
-      if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN;
-
-      if ( i < EDGEPADDING() || i >= ny-1-EDGEPADDING() || j < EDGEPADDING() || j >= nx - 1 - EDGEPADDING()) {
+      if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
         rho[i*nx+j] = NAN;
+      }
+      else {
+      	if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN;
+        else {
+	  double norm=0.0;
+          for(int c=0;c<nz;c++) norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
+          rho[i*nx+j]=rhop(norm,lambda,type);
+	}
       }
     }
   }
@@ -260,6 +264,7 @@ void independent_vector
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
     {
+      if ( std::isfinite(DIJ[(i*nx+j)*nparams*nz]) && std::isfinite(DI[(i*nx+j)*nz]) )   
       Atb(
         &(DIJ[(i*nx+j)*nparams*nz]), 
         &(DI[(i*nx+j)*nz]), b, nz, nparams
@@ -346,6 +351,10 @@ void inverse_compositional_algorithm(
   int size3=nparams*nparams; //size for the Hessian
   int size4=2*nx*ny*nparams; 
   
+  // normalization by max(nx,ny) in the Jacobian
+  int max_size = (nx > ny) ? nx : ny;
+  double normalization_factor = 1.0/max_size;
+
   double *Ix =new double[size1];   //x derivate of the first image
   double *Iy =new double[size1];   //y derivate of the first image
   double *Iw =new double[size1];   //warp of the second image/
@@ -361,8 +370,24 @@ void inverse_compositional_algorithm(
   //Evaluate the gradient of I1
   gradient(I1, Ix, Iy, nx, ny, nz);
   
+  // EDGE PADDING
+  for (int index_color = 0; index_color < nz; index_color++) {
+      for (int i = 0; i < ny; i++) {
+          for( int j = 0; j < nx; j++) {
+              if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
+                  int k = (i * nx + j) * nz + index_color;
+                  Ix[k] = NAN;
+                  Iy[k] = NAN;
+              }
+          }
+      }
+  }
+  
   //Evaluate the Jacobian
-  jacobian(J, nparams, nx, ny);
+  if( NORMALIZATION() )
+    jacobian_normalized(J, nparams, nx, ny, normalization_factor);
+  else 
+    jacobian(J, nparams, nx, ny);
 
   //Compute the steepest descent images
   steepest_descent_images(Ix, Iy, J, DIJ, nparams, nx, ny, nz);
@@ -387,6 +412,15 @@ void inverse_compositional_algorithm(
 
     //Solve equation and compute increment of the motion 
     error=parametric_solve(H_1, b, dp, nparams);
+
+    //Renormalization
+    //Zoom out of max(nx,ny) in each dimension
+    
+    if( NORMALIZATION() ) {
+      for(int i=0;i<nparams;i++)
+        dp[i] *= normalization_factor;
+      zoom_in_parameters(dp, dp, nparams, 1, 1, max_size, max_size);
+    }
 
     //Update the warp x'(x;p) := x'(x;p) * x'(x;dp)^-1
     update_transform(p, dp, nparams);
@@ -443,6 +477,10 @@ void robust_inverse_compositional_algorithm(
   int size3=nparams*nparams; //size for the Hessian
   int size4=2*nx*ny*nparams; 
   
+  // normalization by max(nx,ny) in the Jacobian
+  int max_size = (nx > ny) ? nx : ny;
+  double normalization_factor = 1.0/max_size;
+  
   double *Ix =new double[size1];   //x derivate of the first image
   double *Iy =new double[size1];   //y derivate of the first image
   double *Iw =new double[size1];   //warp of the second image/
@@ -459,7 +497,10 @@ void robust_inverse_compositional_algorithm(
   gradient(I1, Ix, Iy, nx, ny, nz);
   
   //Evaluate the Jacobian
-  jacobian(J, nparams, nx, ny);
+  if( NORMALIZATION() )
+    jacobian_normalized(J, nparams, nx, ny, normalization_factor);
+  else 
+    jacobian(J, nparams, nx, ny);
 
   //Compute the steepest descent images
   steepest_descent_images(Ix, Iy, J, DIJ, nparams, nx, ny, nz);
@@ -497,6 +538,14 @@ void robust_inverse_compositional_algorithm(
     //Solve equation and compute increment of the motion 
     error=parametric_solve(H_1, b, dp, nparams);
 
+    //Renormalization
+    //Zoom out of max(nx,ny) in each dimension
+    if( NORMALIZATION() ) {
+        for(int i=0;i<nparams;i++)
+          dp[i] *= normalization_factor;
+        zoom_in_parameters(dp, dp, nparams, 1, 1, max_size, max_size);
+    }
+    
     //Update the warp x'(x;p) := x'(x;p) * x'(x;dp)^-1
     update_transform(p, dp, nparams);
 
@@ -545,7 +594,7 @@ void pyramidal_inverse_compositional_algorithm(
     int    robust,  //robust error function
     double lambda,  //parameter of robust error function
     bool   verbose,  //switch on messages
-    int first_scale // TEST number of the first scale
+    int first_scale
 )
 {
     int size=nxx*nyy*nzz;
@@ -595,7 +644,6 @@ void pyramidal_inverse_compositional_algorithm(
     }  
 
     //pyramidal approach for computing the transformation
-    //TEST for(int s=nscales-1; s>=0; s--)
     for(int s=nscales-1; s>= first_scale; s--)
     {
       if(verbose) printf("Scale: %d ",s);

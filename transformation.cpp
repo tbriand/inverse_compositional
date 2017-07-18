@@ -79,6 +79,74 @@ void jacobian
 
 /**
  *
+ *  Function to compute the Jacobian matrix with normalization
+ *  These parametrizations of the Jacobian are taken from the book of Zselinski
+ *  (chapter 6 and 9)
+ *
+ */
+void jacobian_normalized
+(
+  double *J,   //computed Jacobian
+  int nparams, //number of parameters
+  int nx,      //number of columns of the image
+  int ny,      //number of rows of the image
+  double f     //normalization factor 
+) 
+{
+  switch(nparams) 
+  {
+    default: case TRANSLATION_TRANSFORM:  //p=(tx, ty) 
+      for(int i=0; i<nx*ny; i++)
+      {
+        int c=2*i*nparams;
+        J[c]  =1.0; J[c+1]=0.0;
+        J[c+2]=0.0; J[c+3]=1.0;
+      }
+      break;
+    case EUCLIDEAN_TRANSFORM:  //p=(tx, ty, tita)
+      for(int i=0; i<ny; i++)
+        for(int j=0; j<nx; j++)
+        {
+          int c=2*(i*nx+j)*nparams;
+          J[c]  =1.0; J[c+1]=0.0; J[c+2]=-i*f; 
+          J[c+3]=0.0; J[c+4]=1.0; J[c+5]= j*f; 
+        }
+      break;
+    case SIMILARITY_TRANSFORM: //p=(tx, ty, a, b)
+      for(int i=0; i<ny; i++)
+        for(int j=0; j<nx; j++)
+        {
+          int c=2*(i*nx+j)*nparams;
+          J[c]  =1.0; J[c+1]=0.0; J[c+2]=j*f; J[c+3]=-i*f;
+          J[c+4]=0.0; J[c+5]=1.0; J[c+6]=i*f; J[c+7]= j*f;
+        }
+      break;
+    case AFFINITY_TRANSFORM:  //p=(tx, ty, a00, a01, a10, a11)
+      for(int i=0; i<ny; i++)
+        for(int j=0; j<nx; j++)
+        {
+          int c=2*(i*nx+j)*nparams;
+          J[c]  =1.0;J[c+1]=0.0;J[c+2]=  j*f;J[c+3]=  i*f;J[c+ 4]=0.0;J[c+ 5]=0.0;
+          J[c+6]=0.0;J[c+7]=1.0;J[c+8]=0.0;J[c+9]=0.0;J[c+10]=  j*f;J[c+11]=  i*f;
+        }
+      break;    
+    case HOMOGRAPHY_TRANSFORM: //p=(h00, h01,..., h21)
+      for(int i=0; i<ny; i++)
+        for(int j=0; j<nx; j++)
+        {
+          int c=2*(i*nx+j)*nparams;
+          J[c]  =  j*f; J[c+1]=  i*f; J[c+2]=1.0;  J[c+3]=0.0; 
+          J[c+4]=0.0; J[c+5]=0.0; J[c+6]=-j*j*f*f; J[c+7]=-j*f*i*f;
+          
+          J[c+8]=0.0; J[c+9] =0.0; J[c+10]= 0.0; J[c+11]=   j*f; 
+          J[c+12]= i*f; J[c+13]=1.0; J[c+14]=-j*i*f*f; J[c+15]=-i*i*f*f;
+        }
+      break;
+  }
+}
+
+/**
+ *
  *  Function to update the current transform with the computed increment
  *  x'(x;p) = x'(x;p) o x'(x;dp)^-1
  *
@@ -92,7 +160,7 @@ void update_transform
 {
   switch(nparams) 
   {
-    default: case TRANSLATION_TRANSFORM: //p=(tx, ty)
+    default: case TRANSLATION_TRANSFORM: //p=(tx, ty)+++
       for(int i = 0; i < nparams; i++) 
         p[i]-=dp[i];
       break;

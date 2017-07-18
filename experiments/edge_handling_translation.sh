@@ -16,7 +16,7 @@ ROBUST=$5
 base_out=burst
 interp=bicubic
 boundary=hsym
-type=8
+type=2
 create_burst $in $base_out $n $interp $boundary $L $type
 
 SCALES=5
@@ -27,7 +27,7 @@ NUMBER=$n
 
 regpat_ica=ica_%i.hom
 regpat_ica_edge=ica_edge_%i.hom
-transform=8
+transform=$type
 INPAT=${base_out}_%i.tiff
 INPAT_NOISY=noisy_%i.tiff
 TRUE_REGPAT=${base_out}_%i.hom
@@ -42,8 +42,8 @@ for i in `seq 2 $NUMBER`; do
         INi=`printf $INPAT_NOISY $i`
         REGi=`printf $regpat_ica $i`
         REGEDGEi=`printf $regpat_ica_edge $i`
-        EDGEPADDING=0 NANIFOUTSIDE=0 inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE -v
-        inverse_compositional_algorithm $REF $INi -f $REGEDGEi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE -v
+        EDGEPADDING=0 NANIFOUTSIDE=0 inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
+        inverse_compositional_algorithm $REF $INi -f $REGEDGEi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
 done
 
 ref_number=1

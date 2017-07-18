@@ -90,8 +90,8 @@ void zoom_out
 **/
 void zoom_in_parameters 
 (
-  double *p,    //input image
-  double *pout, //output image   
+  double *p,    //input parameters
+  double *pout, //output parameters   
   int nparams,  //number of parameters
   int nx,       //width of the original image
   int ny,       //height of the original image
