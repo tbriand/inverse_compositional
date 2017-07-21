@@ -35,9 +35,10 @@
 
 #include "smapa.h"
 // use with EDGEPADDING()
-// change in terminal with EDGEPADDING=7 ./main blabla
+// change in terminal the value of the constant
 SMART_PARAMETER(EDGEPADDING,5)
-SMART_PARAMETER(NORMALIZATION,1)
+SMART_PARAMETER(NORMALIZATION,0)
+SMART_PARAMETER(ROBUST_GRADIENT,1)
 
 /**
  *
@@ -368,7 +369,10 @@ void inverse_compositional_algorithm(
 
    
   //Evaluate the gradient of I1
-  gradient(I1, Ix, Iy, nx, ny, nz);
+   if ( ROBUST_GRADIENT() )
+     gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
+   else
+     gradient(I1, Ix, Iy, nx, ny, nz);
   
   // EDGE PADDING
   for (int index_color = 0; index_color < nz; index_color++) {
@@ -406,6 +410,8 @@ void inverse_compositional_algorithm(
 
     //Compute the error image (I1-I2w)
     difference_image(I1, Iw, DI, nx, ny, nz);
+    if ( ROBUST_GRADIENT() )
+      prefiltering_robust(DI, nx, ny, nz, ROBUST_GRADIENT());
 
     //Compute the independent vector
     independent_vector(DIJ, DI, b, nparams, nx, ny, nz);
@@ -494,7 +500,10 @@ void robust_inverse_compositional_algorithm(
   double *rho=new double[size0];   //robust function
    
   //Evaluate the gradient of I1
-  gradient(I1, Ix, Iy, nx, ny, nz);
+  if ( ROBUST_GRADIENT() )
+    gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
+  else
+    gradient(I1, Ix, Iy, nx, ny, nz);
   
   //Evaluate the Jacobian
   if( NORMALIZATION() )
@@ -519,6 +528,8 @@ void robust_inverse_compositional_algorithm(
 
     //Compute the error image (I1-I2w)
     difference_image(I1, Iw, DI, nx, ny, nz);
+    if ( ROBUST_GRADIENT() )
+      prefiltering_robust(DI, nx, ny, nz, ROBUST_GRADIENT());
 
     //compute robustifiction function
     robust_error_function(DI, rho, lambda_it, robust, nx, ny, nz);

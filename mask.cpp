@@ -11,7 +11,10 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <assert.h>
 
+/** Macro to get the number of elements in a static array */
+#define NUMEL(x)    (sizeof(x)/sizeof(*(x)))
 
 /**
  *
@@ -247,7 +250,6 @@ gradient (double *input,        //input image
     }
 }
 
-
 /**
  *
  * Convolution with a Gaussian
@@ -384,3 +386,266 @@ gaussian (
   delete[]R;
   delete[]T;
 }
+
+/******************* Robust gradient part ***********************/
+
+/**
+ *
+ * Convolution of the rows of an image with a kernel
+ *
+ */
+static void
+convolution_rows (
+  double *I,    //input/output image
+  int xdim,     //image width
+  int ydim,     //image height
+  int zdim,     //number of color channels in the image
+  double *kernel,   //kernel
+  int kdim,     //kernel length
+  int bc        //boundary condition
+  )
+{
+  int i, j, k;
+  
+  // kernel is of the form [ lpadding values, center, rpadding values ]
+  int kcenter = (kdim - 1)/2;
+  int lpadding = kcenter;
+  int rpadding = kdim/2;
+  
+  // buffer taking into account the boundary condition
+  int Bdim = lpadding + xdim + rpadding;
+  double *B = new double[Bdim];
+
+  // position of the boundaries in the buffer
+  int bdx = xdim + lpadding;
+  
+  //Loop for every channel
+  for(int index_color = 0; index_color < zdim; index_color++){
+  
+    //convolution of each line of the input image
+    for (k = 0; k < ydim; k++) {
+      // construct buffer for the line k
+      for (i = lpadding; i < bdx; i++) 
+        B[i] = I[(k * xdim + i - lpadding) * zdim + index_color];
+      switch (bc)
+        {
+        case 0: //Dirichlet boundary conditions
+          for (i = 0; i < lpadding; i++)
+            B[i] = 0;
+          for (j = bdx; j < Bdim; j++)
+            B[j] = 0;  
+          break;
+        case 1: //Reflecting boundary conditions (wsym)
+          for (i = 0; i < lpadding; i++)
+              B[i] = I[(k * xdim + lpadding - i ) * zdim + index_color];
+          for (j = bdx; j < Bdim; j++) 
+              B[j] = I[(k * xdim + xdim + bdx - j - 2) * zdim + index_color ];
+          break;
+        case 2: //Periodic boundary conditions
+          for (i = 0; i < lpadding; i++)
+              B[i] = I[(k * xdim + xdim - lpadding + i) * zdim + index_color];
+          for (j = bdx; j < Bdim; j++) 
+              B[j] = I[(k * xdim + j - bdx) * zdim + index_color];
+          break;
+        }
+      
+      // convolution of the line k
+      for (i = lpadding; i < bdx; i++) {
+          double sum = 0;
+          for (int j = 0; j < kdim; j++)
+            sum += B[i-lpadding+j]*kernel[j];
+          
+          // update I
+          I[(k * xdim + i - lpadding) * zdim + index_color] = sum;
+      }
+    }
+  }
+  
+  delete[]B;
+}
+
+
+/**
+ *
+ * Convolution of the columns of an image with a kernel
+ *
+ */
+static void
+convolution_columns (
+  double *I,    //input/output image
+  int xdim,     //image width
+  int ydim,     //image height
+  int zdim,     //number of color channels in the image
+  double *kernel,   //kernel
+  int kdim,     //kernel length
+  int bc        //boundary condition
+  )
+{
+  int i, j, k;
+  
+  // kernel is of the form [ lpadding values, center, rpadding values ]
+  int kcenter = (kdim - 1)/2;
+  int lpadding = kcenter;
+  int rpadding = kdim/2;
+  
+  // buffer taking into account the boundary condition
+  int Bdim = lpadding + ydim + rpadding;
+  double *B = new double[Bdim];
+
+  // position of the boundaries in the buffer
+  int bdy = ydim + lpadding;
+  
+  //Loop for every channel
+  for(int index_color = 0; index_color < zdim; index_color++){
+  
+    //convolution of each column of the input image
+    for (k = 0; k < xdim; k++) {
+      // construct buffer for the column k
+      for (i = lpadding; i < bdy; i++) 
+        B[i] = I[((i - lpadding) * xdim + k) * zdim + index_color];
+      switch (bc)
+        {
+        case 0: //Dirichlet boundary conditions
+          for (i = 0; i < lpadding; i++)
+            B[i] = 0;
+          for (j = bdy; j < Bdim; j++)
+            B[j] = 0;  
+          break;
+        case 1: //Reflecting boundary conditions
+          for (i = 0; i < lpadding; i++)
+              B[i] = I[((lpadding - i) * xdim + k ) * zdim + index_color];
+          for (j = bdy; j < Bdim; j++) 
+              B[j] = I[((bdy + ydim - j - 2) * xdim + k) * zdim + index_color ];
+          break;
+        case 2: //Periodic boundary conditions
+          for (i = 0; i < lpadding; i++)
+              B[i] = I[((ydim - lpadding + i) * xdim + k) * zdim + index_color];
+          for (j = bdy; j < Bdim; j++) 
+              B[j] = I[((j - bdy) * xdim + k) * zdim + index_color];
+          break;
+        }
+      
+      // convolution of the line k
+      for (i = lpadding; i < bdy; i++) {
+          double sum = 0;
+          for (int j = 0; j < kdim; j++)
+            sum += B[i-lpadding+j]*kernel[j];
+          
+          // update I
+          I[((i - lpadding) * xdim + k) * zdim + index_color] = sum;
+      }
+    }
+  }
+  
+  delete[]B;
+}
+
+static double kCentral[3] = {0.0, 1.0, 0.0};
+static double dCentral[3] = {-1.0, 0.0, 1.0};
+
+static double kHypomode[2] = {0.5, 0.5};
+static double dHypomode[2] = {-1 , 1};
+
+static double kFarid3[3] = {0.229879, 0.540242, 0.229879};
+static double dFarid3[3] = {-0.455271, 0.0, 0.455271};
+
+static double kFarid5[5] = {0.037659, 0.249153, 0.426375, 0.249153, 0.037659};
+static double dFarid5[5] = {-0.109604, -0.276691, 0, 0.276691, 0.109604};
+
+// sigma = 0.3
+static double kGaussian3[3] = {0.003865, 0.999990, 0.003865};
+static double dGaussian3[3] = {-0.707110, 0.0, 0.707110};
+
+// sigma = 0.6
+static double kGaussian5[5] = {0.003645, 0.235160, 0.943070, 0.235160, 0.003645};
+static double dGaussian5[5] = {-0.021915,-0.706770, 0, 0.706770, 0.021915};
+
+static gradientStruct gradientTable[] = {
+    {kCentral, dCentral, 3},
+    {kHypomode,  dHypomode, 2},
+    {kFarid3,  dFarid3, 3},
+    {kFarid5,  dFarid5, 5},
+    {kGaussian3, dGaussian3, 3},
+    {kGaussian5, dGaussian5, 5}
+};
+
+/**
+ *
+ * Compute the gradient with the 3x3 Farid kernel
+ * dx = d * k^t * I
+ * dy = k * d^t * I
+ * where * denotes the convolution operator
+ * 
+ */
+void
+gradient_robust (double *input,        //input image
+          double *dx,           //computed x derivative
+          double *dy,           //computed y derivative
+          int nx,               //image width
+          int ny,               //image height
+          int nz,               //number of color channels in the image
+          int gradientType      //type of gradient 
+  )
+{
+  //kernel definition
+  assert(gradientType < (int) NUMEL(gradientTable));
+  double *kernel = gradientTable[gradientType].k;
+  double *differentiator = gradientTable[gradientType].d;
+  int nkernel = gradientTable[gradientType].size;
+//   int nkernel = 3;
+//   double kernel[nkernel] = {0.229879, 0.540242, 0.229879};
+//   double differentiator[nkernel] = {-0.455271, 0.0, 0.455271};
+//   double kernel[nkernel] = {0.0, 1.0, 0.0};
+//   double differentiator[nkernel] = {-1.0, 0.0, 1.0};
+  int bc = 1;
+  
+  //initialization
+  for(int i = 0; i < nx*ny*nz; i++)
+    dx[i] = dy[i] = input[i];
+  
+  //x derivative computation
+    //convolution of each column (k^t * I)
+    convolution_columns(dx, nx, ny , nz, kernel, nkernel, bc);  
+    
+    //convolution of each line (d * (k^t * I))
+    convolution_rows(dx, nx, ny , nz, differentiator, nkernel, bc);
+    
+  //y derivative computation
+    //convolution of each column (d^t * I)
+    convolution_columns(dy, nx, ny , nz, differentiator, nkernel, bc);  
+    
+    //convolution of each line (k * (d^t * dx))
+    convolution_rows(dy, nx, ny , nz, kernel, nkernel, bc);
+}
+
+/**
+ *
+ * Prefiltering of an image for the 3x3 Farid kernel
+ * Boundaries are not handled (because edge padding should be used)
+ * 
+ */
+void
+prefiltering_robust (
+          double *I,            //input/output image
+          int nx,               //image width
+          int ny,               //image height
+          int nz,               //number of color channels in the image 
+          int gradientType      //type of gradient
+)
+{
+  // kernel definition
+  assert(gradientType < (int) NUMEL(gradientTable));
+  double *kernel = gradientTable[gradientType].k;
+  int nkernel = gradientTable[gradientType].size;
+//   int nkernel = 3;
+//   double kernel[nkernel] = {0.229879, 0.540242, 0.229879};
+  //double kernel[nkernel] = {0.0, 1.0, 0.0};
+  int bc = 1;  
+  
+  //convolution of each line of the input image
+  convolution_rows(I, nx, ny , nz, kernel, nkernel, bc);
+  
+  //convolution of each column of the input image
+  convolution_columns(I, nx, ny , nz, kernel, nkernel, bc);
+}
+

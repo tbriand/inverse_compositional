@@ -42,8 +42,8 @@ for i in `seq 2 $NUMBER`; do
         INi=`printf $INPAT_NOISY $i`
         REGi=`printf $regpat_ica $i`
         REGEDGEi=`printf $regpat_ica_edge $i`
-        EDGEPADDING=0 NANIFOUTSIDE=0 inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE -v
-        inverse_compositional_algorithm $REF $INi -f $REGEDGEi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE -v
+        EDGEPADDING=0 NANIFOUTSIDE=0 inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
+        inverse_compositional_algorithm $REF $INi -f $REGEDGEi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
 done
 
 ref_number=1
