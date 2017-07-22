@@ -675,15 +675,20 @@ void pyramidal_inverse_compositional_algorithm(
 
         robust_inverse_compositional_algorithm(
           I1s[s], I2s[s], ps[s], nparams, nx[s], 
-          ny[s], nzz, TOL, robust, lambda,verbose
-        );
+          ny[s], nzz, TOL, robust, lambda,verbose);
       }
 
       //if it is not the finer scale, then upsample the parameters
       if(s) 
         zoom_in_parameters(
-          ps[s], ps[s-1], nparams, nx[s], ny[s], nx[s-1], ny[s-1]
-        );
+          ps[s], ps[s-1], nparams, nx[s], ny[s], nx[s-1], ny[s-1]);
+    }
+
+    if ( first_scale > 1 )
+    {
+        zoom_in_parameters(
+          ps[first_scale - 1], ps[0], nparams,
+          nx[first_scale-1], ny[first_scale - 1], nx[0], ny[0]);
     }
 
     //delete allocated memory

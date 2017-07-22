@@ -109,10 +109,11 @@ bicubic_interpolation(
   ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
   ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
 
-  if ( uu < EDGEPADDING() || uu > nx-1-EDGEPADDING()
-       || vv < EDGEPADDING() || vv > ny-1-EDGEPADDING() ) {
-    out = true;
-  } 
+  if ( EDGEPADDING() ) {
+    if ( uu < EDGEPADDING() || uu > nx-1-EDGEPADDING()
+         || vv < EDGEPADDING() || vv > ny-1-EDGEPADDING() )
+      out = true;
+  }
 
   if (out && border_out) {
     if (NANIFOUTSIDE()) return NAN;

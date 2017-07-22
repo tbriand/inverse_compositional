@@ -48,7 +48,7 @@ PRECISION=0.001
 # comparison fields
 centered=0
 w=`imprintf %w $in`
-h=`imprintf %h $in` 
+h=`imprintf %h $in`
 opt=1 # to determine if comparison has h1-h2 (1) or h2^-1 o h1 - id (0)
 
 # resampling parameters
@@ -62,7 +62,7 @@ boundary=hsym
 INPAT=../${base_out}_%i.tiff
 INPAT_NOISY=noisy_%i.tiff
 TRUE_REGPAT=../${base_out}_%i.hom
-REF=`printf $INPAT_NOISY 1` 
+REF=`printf $INPAT_NOISY 1`
 
 # loop over the noise level
 # echo "Starting the loop"
@@ -76,18 +76,18 @@ for noise in 0 3 5 10; do
     for i in `seq 1 $NUMBER`; do
             INi=`printf $INPAT $i`
             OUTi=`printf $INPAT_NOISY $i`
-            echo "add_noise $noise $INi $OUTi"
+            #echo "add_noise $noise $INi $OUTi"
     done | parallel -j 3
-    
+
     # SIFT + RANSAC estimation
         echo "SIFT + RANSAC estimation"
         echo "SIFT + RANSAC estimation" >> $global_results
         start=`date +%s.%N`
-        burst_registration_iteration.sh $INPAT_NOISY $regpat $ref_number $NUMBER $ref_number $method $boundary $sr 0 > /dev/null
+        #burst_registration_iteration.sh $INPAT_NOISY $regpat $ref_number $NUMBER $ref_number $method $boundary $sr 0 > /dev/null
         end=`date +%s.%N`
         runtime=$(echo "$end - $start" | bc)
         echo "runtime $runtime seconds" >> $global_results
-        
+
         # field comparison
         for i in `seq 2 $NUMBER`; do
             REGSIFTi=`printf $regpat_sift $i`
@@ -101,28 +101,28 @@ for noise in 0 3 5 10; do
         mean_and_std $rmse_sift 2 >> $global_results
         echo "Mean and std of the MAX" >> $global_results
         mean_and_std $max_sift 2 >> $global_results
-        
+
         # resampling
 #         for i in `seq 2 $NUMBER`; do
 #             INi=`printf $INPAT $i`
 #             INNOISYi=`printf $INPAT_NOISY $i`
 #             REGi=`printf $TRUE_REGPAT $i`
-#             
+#
 #             # sift
 #             REGSIFTi=`printf $regpat_sift $i`
 #             OUTi=`printf $outpat_sift $i`
 #             synflow_global hom "`cat $REGSIFTi`" ../$in $OUTi /dev/null $zoom $interp /dev/null $boundary
 #             diff2 $OUTi $INi $OUTi
 #             crop 10 10 -10 -10 $OUTi $OUTi
-#             
-#             # sift noisy    
+#
+#             # sift noisy
 #             REGSIFTi=`printf $regpat_sift $i`
 #             OUTi=`printf $outpat_sift_noisy $i`
 #             synflow_global hom "`cat $REGSIFTi`" $REF $OUTi /dev/null $zoom $interp /dev/null $boundary
 #             diff2 $OUTi $INNOISYi $OUTi
 #             crop 10 10 -10 -10 $OUTi $OUTi
 #         done
-    
+
     # ICA
         echo "ICA estimation"
         echo -e "\n ICA estimation" >> $global_results
@@ -146,7 +146,7 @@ for noise in 0 3 5 10; do
                         end=`date +%s.%N`
                         runtime=$(echo "$end - $start" | bc) 
                         echo "runtime $runtime seconds" >> $global_results
-                        
+
                         # field comparison
                         field_ica=field_ica_${basefile}_%i.tiff
                         rmse_ica=rmse_ica_${basefile}.txt
@@ -163,7 +163,7 @@ for noise in 0 3 5 10; do
                         mean_and_std $rmse_ica 2 >> $global_results
                         echo "Mean and std of the MAX" >> $global_results
                         mean_and_std $max_ica 2 >> $global_results
-                        
+
                         # image resampling
 #                         outpat_ica=ica_${basefile}_%i.tiff
 #                         outpat_ica_noisy=ica_noisy_${basefile}_%i.tiff
@@ -188,7 +188,7 @@ for noise in 0 3 5 10; do
                 done
             done
         done
-    
+
     cd ..
 done
 

@@ -3,7 +3,7 @@
 # create directory
 dir=evaluation_modification
 cd $dir
-# 
+#
 # # global file to store the result
 # global_results=latex_tables.txt
 
@@ -17,14 +17,14 @@ max_sift=max_sift.txt
     echo "\\begin{tabular}{l|l|l|l|l}"
     echo "& $\\sigma = 0$ & $\\sigma = 3$ & $\\sigma = 5$ & $\\sigma = 10$\\\\"
     echo "\\hline"
-    
+
     # RMSE
     line2echo="RMSE"
     for noise in 0 3 5 10; do
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $rmse_sift 0`"
-        cd ..        
+        cd ..
     done
     line2echo="$line2echo \\\\"
     echo "$line2echo"
@@ -35,7 +35,7 @@ max_sift=max_sift.txt
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $rmse_sift 1`"
-        cd ..        
+        cd ..
     done
     line2echo="$line2echo \\\\"
     echo "$line2echo"
@@ -47,7 +47,7 @@ max_sift=max_sift.txt
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $max_sift 0`"
-        cd ..        
+        cd ..
     done
     line2echo="$line2echo \\\\"
     echo "$line2echo"
@@ -58,13 +58,13 @@ max_sift=max_sift.txt
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $max_sift 1`"
-        cd ..        
+        cd ..
     done
     line2echo="$line2echo \\\\"
     echo "$line2echo"
     echo "\\hline"
-    
-    echo "Time & v1 & v2 & v3 & v4" 
+
+    echo "Time & v1 & v2 & v3 & v4"
     echo "\\end{tabular}"
     echo "\\caption{SIFT + RANSAC estimation}"
     echo "\\end{center}"
@@ -75,6 +75,7 @@ max_sift=max_sift.txt
     # loop over the noise level
     # echo "Starting the loop"
     for noise in 0 3 5 10; do
+    #for noise in 0 3 5; do
         dir=noise$noise
         cd $dir
         echo ""
@@ -85,7 +86,7 @@ max_sift=max_sift.txt
         echo "\\hline"
         echo "\\multicolumn{2}{l|}{} & &  DBV & & DBV & & DBV & & DBV & & DBV\\\\"
         echo "\\hline"
-        
+
         declare -a arr=("Central" "Hypomode" "Farid 3x3" "Farid 5x5" "Gaussian $\\sigma = 0.3$" "Gaussian $\\sigma = 0.6$")
         ROBUST_GRADIENT=0
         for gradient in "${arr[@]}"; do
@@ -146,9 +147,9 @@ max_sift=max_sift.txt
             echo "$line2echo"
             
             if [ "$ROBUST_GRADIENT" -eq "5" ]; then 
-                echo "& Time & v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9 & v10"
+                echo "& Time (s) & v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9 & v10"
             else
-                echo "& Time & v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9 & v10\\\\"
+                echo "& Time (s) & v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9 & v10\\\\"
                 echo "\\hline"
             fi
             ROBUST_GRADIENT=$(($ROBUST_GRADIENT + 1))
