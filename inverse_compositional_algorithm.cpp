@@ -162,7 +162,7 @@ void hessian
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++) {
-      if ( std::isfinite(rho[i*nx+j]) ) 
+      if ( std::isfinite(rho[i*nx+j]) &&  std::isfinite(DIJ[(i*nx+j)*nz*nparams])) 
         sAtA(rho[i*nx+j], &(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
     }
 }
@@ -299,7 +299,7 @@ void independent_vector
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
     {
-      if ( std::isfinite(rho[i*nx+j]) )
+      if ( std::isfinite(rho[i*nx+j]) && std::isfinite(DI[(i*nx+j)*nz]) )
       sAtb(
         rho[i*nx+j], &(DIJ[(i*nx+j)*nparams*nz]), 
         &(DI[(i*nx+j)*nz]), b, nz, nparams

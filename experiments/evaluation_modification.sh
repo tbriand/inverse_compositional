@@ -126,7 +126,8 @@ for noise in 0 3 5 10; do
     # ICA
         echo "ICA estimation"
         echo -e "\n ICA estimation" >> $global_results
-        for NORMALIZATION in 0 1; do
+        #for NORMALIZATION in 0 1; do
+        for NORMALIZATION in 0; do
             for EDGEPADDING in 0 5; do
                 for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                     for ROBUST in 0 1 2 3 4; do
