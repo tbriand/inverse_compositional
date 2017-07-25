@@ -7,6 +7,9 @@
 // Copyright (C) 2014, Nelson Monzón López  <nmonzon@ctim.es>
 // All rights reserved.
 
+// July 2017
+// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
+
 #ifndef MASK_H
 #define MASK_H
 
@@ -55,18 +58,6 @@ void gradient_farid(
 
 /**
  *
- * Prefiltering of an image for the 3x3 Farid kernel
- *
- */
-void prefiltering_farid(
-  double *input,  //input image
-  int nx,         //image width
-  int ny,         //image height
-  int nz          //number of color channels in the image 
-);
-
-/**
- *
  * Convolution with a Gaussian
  *
  */
@@ -94,7 +85,7 @@ struct gradientStruct
 
 /**
  *
- * Compute the gradient with the 3x3 Farid kernel
+ * Compute the gradient estimator 
  * dx = d * k^t * I
  * dy = k * d^t * I
  * where * denotes the convolution operator
@@ -111,8 +102,7 @@ void gradient_robust (double *input,        //input image
 
 /**
  *
- * Prefiltering of an image for the 3x3 Farid kernel
- * Boundaries are not handled (because edge padding should be used)
+ * Prefiltering of an image 
  * 
  */
 void prefiltering_robust (

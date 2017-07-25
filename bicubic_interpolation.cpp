@@ -7,15 +7,20 @@
 // Copyright (C) 2014, Nelson Monzón López <nmonzon@ctim.es>
 // All rights reserved.
 
+// July 2017
+// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
+// Possibility to set to NAN values pixels that are too
+// close to the boundary of the images (or outside)
 
 #include "bicubic_interpolation.h"
 #include "transformation.h"
 #include <cmath> 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "smapa.h"
-SMART_PARAMETER(NANIFOUTSIDE,1)
-SMART_PARAMETER(EDGEPADDING,5)
+SMART_PARAMETER(NANIFOUTSIDE,1) //set values to 0 if 0 and NAN if 1
+SMART_PARAMETER(EDGEPADDING,5)  //control the width of discarded values
 
 /**
   *
@@ -109,6 +114,7 @@ bicubic_interpolation(
   ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
   ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
 
+  // Discard values if too close to the boundary
   if ( EDGEPADDING() ) {
     if ( uu < EDGEPADDING() || uu > nx-1-EDGEPADDING()
          || vv < EDGEPADDING() || vv > ny-1-EDGEPADDING() )

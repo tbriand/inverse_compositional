@@ -6,6 +6,8 @@
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
+// July 2017
+// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
 #ifndef TRANSFORMATION_H
 #define TRANSFORMATION_H

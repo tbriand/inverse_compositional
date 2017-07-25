@@ -22,6 +22,9 @@
   * 
 **/
 
+//July 2017
+//File modified by Thibaud Briand <thibaud.briand@enpc.fr>
+
 #include <stdlib.h>
 #include <cmath>
 #include <stdio.h>
@@ -34,11 +37,9 @@
 #include "zoom.h"
 
 #include "smapa.h"
-// use with EDGEPADDING()
-// change in terminal the value of the constant
-SMART_PARAMETER(EDGEPADDING,5)
-SMART_PARAMETER(NORMALIZATION,0)
-SMART_PARAMETER(ROBUST_GRADIENT,1)
+SMART_PARAMETER(EDGEPADDING,5)     //to discard boundary pixels (valued as NAN)
+SMART_PARAMETER(NORMALIZATION,0)   //to normalize the position
+SMART_PARAMETER(ROBUST_GRADIENT,2) //choice of the robust gradient
 
 /**
  *
@@ -132,7 +133,7 @@ void hessian
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++) {
-        if ( std::isfinite(DIJ[(i*nx+j)*nz*nparams]) )
+        if ( std::isfinite(DIJ[(i*nx+j)*nz*nparams]) ) //Discarded if NAN
           AtA(&(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
     }
 }
@@ -162,6 +163,7 @@ void hessian
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++) {
+      //Discarded if NAN
       if ( std::isfinite(rho[i*nx+j]) &&  std::isfinite(DIJ[(i*nx+j)*nz*nparams])) 
         sAtA(rho[i*nx+j], &(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
     }
@@ -227,10 +229,10 @@ void robust_error_function
     for(int j=0;j<nx;j++)
     {
       if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
-        rho[i*nx+j] = NAN;
+        rho[i*nx+j] = NAN; //Discard if too close to the boundary
       }
       else {
-      	if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN;
+      	if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN; //Already discarded
         else {
 	  double norm=0.0;
           for(int c=0;c<nz;c++) norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
@@ -264,7 +266,7 @@ void independent_vector
 
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
-    {
+    { //Discard if NAN
       if ( std::isfinite(DIJ[(i*nx+j)*nparams*nz]) && std::isfinite(DI[(i*nx+j)*nz]) )   
       Atb(
         &(DIJ[(i*nx+j)*nparams*nz]), 
@@ -298,7 +300,7 @@ void independent_vector
 
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
-    {
+    { //Discard if NAN
       if ( std::isfinite(rho[i*nx+j]) && std::isfinite(DI[(i*nx+j)*nz]) )
       sAtb(
         rho[i*nx+j], &(DIJ[(i*nx+j)*nparams*nz]), 
@@ -369,12 +371,13 @@ void inverse_compositional_algorithm(
 
    
   //Evaluate the gradient of I1
-   if ( ROBUST_GRADIENT() )
-     gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
-   else
-     gradient(I1, Ix, Iy, nx, ny, nz);
+  //Do not prefilter if central differences are used
+  if ( ROBUST_GRADIENT() )
+    gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
+  else
+    gradient(I1, Ix, Iy, nx, ny, nz);
   
-  // EDGE PADDING
+  //Discard boundary pixels
   for (int index_color = 0; index_color < nz; index_color++) {
       for (int i = 0; i < ny; i++) {
           for( int j = 0; j < nx; j++) {
@@ -400,18 +403,23 @@ void inverse_compositional_algorithm(
   hessian(DIJ, H, nparams, nx, ny, nz);
   inverse_hessian(H, H_1, nparams);
 
+
+  //Prefiltering of the images before the loop
+  if ( ROBUST_GRADIENT() ) {
+    prefiltering_robust(I1, nx, ny, nz, ROBUST_GRADIENT());
+    prefiltering_robust(I2, nx, ny, nz, ROBUST_GRADIENT());
+  }
+
   //Iterate
   double error=1E10;
   int niter=0;
-  
+ 
   do{     
     //Warp image I2
     bicubic_interpolation(I2, Iw, p, nparams, nx, ny, nz);
 
     //Compute the error image (I1-I2w)
     difference_image(I1, Iw, DI, nx, ny, nz);
-    if ( ROBUST_GRADIENT() )
-      prefiltering_robust(DI, nx, ny, nz, ROBUST_GRADIENT());
 
     //Compute the independent vector
     independent_vector(DIJ, DI, b, nparams, nx, ny, nz);
@@ -421,7 +429,6 @@ void inverse_compositional_algorithm(
 
     //Renormalization
     //Zoom out of max(nx,ny) in each dimension
-    
     if( NORMALIZATION() ) {
       for(int i=0;i<nparams;i++)
         dp[i] *= normalization_factor;
@@ -500,6 +507,7 @@ void robust_inverse_compositional_algorithm(
   double *rho=new double[size0];   //robust function
    
   //Evaluate the gradient of I1
+  //Do not prefilter if central differences are used
   if ( ROBUST_GRADIENT() )
     gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
   else
@@ -514,6 +522,12 @@ void robust_inverse_compositional_algorithm(
   //Compute the steepest descent images
   steepest_descent_images(Ix, Iy, J, DIJ, nparams, nx, ny, nz);
   
+  //Prefiltering of the images before the loop
+  if ( ROBUST_GRADIENT() ) {
+    prefiltering_robust(I1, nx, ny, nz, ROBUST_GRADIENT());
+    prefiltering_robust(I2, nx, ny, nz, ROBUST_GRADIENT());
+  }
+
   //Iterate
   double error=1E10;
   int niter=0;
@@ -528,8 +542,6 @@ void robust_inverse_compositional_algorithm(
 
     //Compute the error image (I1-I2w)
     difference_image(I1, Iw, DI, nx, ny, nz);
-    if ( ROBUST_GRADIENT() )
-      prefiltering_robust(DI, nx, ny, nz, ROBUST_GRADIENT());
 
     //compute robustifiction function
     robust_error_function(DI, rho, lambda_it, robust, nx, ny, nz);
@@ -684,6 +696,7 @@ void pyramidal_inverse_compositional_algorithm(
           ps[s], ps[s-1], nparams, nx[s], ny[s], nx[s-1], ny[s-1]);
     }
 
+    //Upsample the parameters
     if ( first_scale > 1 )
     {
         zoom_in_parameters(

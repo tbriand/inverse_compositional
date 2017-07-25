@@ -106,8 +106,8 @@ void pyramidal_inverse_compositional_algorithm(
     double TOL,     //stopping criterion threshold
     int    robust,  //robust error function
     double lambda,  //parameter of robust error function
-    bool   verbose,  //switch on messages
-    int first_scale // TEST number of the first scale  
+    bool   verbose, //switch on messages
+    int first_scale //number of the first scale  
 );
 
 #endif

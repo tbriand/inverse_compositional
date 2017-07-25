@@ -6,13 +6,15 @@
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
+//July 2017
+//File modified by Thibaud Briand <thibaud.briand@enpc.fr>
+
 #include <time.h> 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h> 
 #include <math.h>
 #include <algorithm>
-
 #include "inverse_compositional_algorithm.h"
 #include "file.h"
 
@@ -63,6 +65,8 @@ void print_help(char *name)
   printf(" -l F    \t Value of the parameter for the robust error function\n");
   printf("         \t   A value <=0 if it is automatically computed\n");
   printf("         \t   Default value %0.0f\n", PAR_DEFAULT_LAMBDA);
+  printf(" -s S    \t First scale used in the pyramid \n");
+  printf("         \t   Default value %d\n", PAR_DEFAULT_FIRST_SCALE);
   printf(" -v      \t Switch on verbose mode. \n\n\n");
 }
 
@@ -99,13 +103,13 @@ int read_parameters(
 
     //assign default values to the parameters
     strcpy(outfile,PAR_DEFAULT_OUTFILE);
-    nscales=PAR_DEFAULT_NSCALES;
-    zfactor=PAR_DEFAULT_ZFACTOR;
-    TOL    =PAR_DEFAULT_TOL;
-    nparams=PAR_DEFAULT_TYPE; 
-    robust =PAR_DEFAULT_ROBUST; 
-    lambda =PAR_DEFAULT_LAMBDA; 
-    verbose=PAR_DEFAULT_VERBOSE;
+    nscales    =PAR_DEFAULT_NSCALES;
+    zfactor    =PAR_DEFAULT_ZFACTOR;
+    TOL        =PAR_DEFAULT_TOL;
+    nparams    =PAR_DEFAULT_TYPE; 
+    robust     =PAR_DEFAULT_ROBUST; 
+    lambda     =PAR_DEFAULT_LAMBDA; 
+    verbose    =PAR_DEFAULT_VERBOSE;
     first_scale=PAR_DEFAULT_FIRST_SCALE;
 
     //read each parameter from the command line
@@ -179,6 +183,7 @@ int read_parameters(
  *   -type        type of the parametric model (the number of parameters):
  *                Translation(2), Euclidean(3), Similarity(4), Affinity(6), 
  *                Homography(8)
+ *   -first_scale first scale used in the pyramid
  *   -verbose     switch on/off messages
  *
  */

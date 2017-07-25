@@ -6,8 +6,10 @@
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
-#include "transformation.h"
+// July 2017
+// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
+#include "transformation.h"
 #include <math.h>
 
 /**

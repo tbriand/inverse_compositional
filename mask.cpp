@@ -7,8 +7,11 @@
 // Copyright (C) 2014, Nelson Monzón López  <nmonzon@ctim.es>
 // All rights reserved.
 
-#include "mask.h"
+// July 2017
+// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
+
+#include "mask.h"
 #include <math.h>
 #include <stdio.h>
 #include <assert.h>
@@ -396,13 +399,13 @@ gaussian (
  */
 static void
 convolution_rows (
-  double *I,    //input/output image
-  int xdim,     //image width
-  int ydim,     //image height
-  int zdim,     //number of color channels in the image
-  double *kernel,   //kernel
-  int kdim,     //kernel length
-  int bc        //boundary condition
+  double *I,      //input/output image
+  int xdim,       //image width
+  int ydim,       //image height
+  int zdim,       //number of color channels in the image
+  double *kernel, //kernel
+  int kdim,       //kernel length
+  int bc          //boundary condition
   )
 {
   int i, j, k;
@@ -472,13 +475,13 @@ convolution_rows (
  */
 static void
 convolution_columns (
-  double *I,    //input/output image
-  int xdim,     //image width
-  int ydim,     //image height
-  int zdim,     //number of color channels in the image
-  double *kernel,   //kernel
-  int kdim,     //kernel length
-  int bc        //boundary condition
+  double *I,      //input/output image
+  int xdim,       //image width
+  int ydim,       //image height
+  int zdim,       //number of color channels in the image
+  double *kernel, //kernel
+  int kdim,       //kernel length
+  int bc          //boundary condition
   )
 {
   int i, j, k;
@@ -540,45 +543,51 @@ convolution_columns (
   delete[]B;
 }
 
+/* Definition of the gradient estimators */
+//Central
 static double kCentral[3] = {0.0, 1.0, 0.0};
 static double dCentral[3] = {-1.0, 0.0, 1.0};
 
+//Hypomode
 static double kHypomode[2] = {0.5, 0.5};
 static double dHypomode[2] = {-1 , 1};
 
+//Farid 3x3
 static double kFarid3[3] = {0.229879, 0.540242, 0.229879};
 static double dFarid3[3] = {-0.455271, 0.0, 0.455271};
 
+//Farid 5x5
 static double kFarid5[5] = {0.037659, 0.249153, 0.426375, 0.249153, 0.037659};
 static double dFarid5[5] = {-0.109604, -0.276691, 0, 0.276691, 0.109604};
 
-// sigma = 0.3
+//Gaussian sigma = 0.3
 static double kGaussian3[3] = {0.003865, 0.999990, 0.003865};
 static double dGaussian3[3] = {-0.707110, 0.0, 0.707110};
 
-// sigma = 0.6
+//Gaussian sigma = 0.6
 static double kGaussian5[5] = {0.003645, 0.235160, 0.943070, 0.235160, 0.003645};
 static double dGaussian5[5] = {-0.021915,-0.706770, 0, 0.706770, 0.021915};
 
+//Store the gradient in a table
 static gradientStruct gradientTable[] = {
-    {kCentral, dCentral, 3},
-    {kHypomode,  dHypomode, 2},
-    {kFarid3,  dFarid3, 3},
-    {kFarid5,  dFarid5, 5},
+    {kCentral,   dCentral,   3},
+    {kHypomode,  dHypomode,  2},
+    {kFarid3,    dFarid3,    3},
+    {kFarid5,    dFarid5,    5},
     {kGaussian3, dGaussian3, 3},
     {kGaussian5, dGaussian5, 5}
 };
 
 /**
  *
- * Compute the gradient with the 3x3 Farid kernel
+ * Compute the gradient estimator
  * dx = d * k^t * I
  * dy = k * d^t * I
  * where * denotes the convolution operator
  * 
  */
 void
-gradient_robust (double *input,        //input image
+gradient_robust (double *input, //input image
           double *dx,           //computed x derivative
           double *dy,           //computed y derivative
           int nx,               //image width
@@ -592,11 +601,6 @@ gradient_robust (double *input,        //input image
   double *kernel = gradientTable[gradientType].k;
   double *differentiator = gradientTable[gradientType].d;
   int nkernel = gradientTable[gradientType].size;
-//   int nkernel = 3;
-//   double kernel[nkernel] = {0.229879, 0.540242, 0.229879};
-//   double differentiator[nkernel] = {-0.455271, 0.0, 0.455271};
-//   double kernel[nkernel] = {0.0, 1.0, 0.0};
-//   double differentiator[nkernel] = {-1.0, 0.0, 1.0};
   int bc = 1;
   
   //initialization
@@ -620,8 +624,7 @@ gradient_robust (double *input,        //input image
 
 /**
  *
- * Prefiltering of an image for the 3x3 Farid kernel
- * Boundaries are not handled (because edge padding should be used)
+ * Prefiltering of an image  
  * 
  */
 void
@@ -637,9 +640,6 @@ prefiltering_robust (
   assert(gradientType < (int) NUMEL(gradientTable));
   double *kernel = gradientTable[gradientType].k;
   int nkernel = gradientTable[gradientType].size;
-//   int nkernel = 3;
-//   double kernel[nkernel] = {0.229879, 0.540242, 0.229879};
-  //double kernel[nkernel] = {0.0, 1.0, 0.0};
   int bc = 1;  
   
   //convolution of each line of the input image
@@ -648,4 +648,3 @@ prefiltering_robust (
   //convolution of each column of the input image
   convolution_columns(I, nx, ny , nz, kernel, nkernel, bc);
 }
-
