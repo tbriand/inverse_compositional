@@ -238,9 +238,9 @@ void save
 ) 
 {
   FILE *fd=fopen(file,"w");
-  fprintf(fd,"%d\n", nparams);
+  fprintf(fd,"%.14lg\n", nparams);
   for(int j=0; j<nparams; j++)
-    fprintf(fd,"%f ", p[j]);
+    //fprintf(fd,"%f ", p[j]);
   fprintf(fd,"\n");
   fclose(fd);
 }
