@@ -2,7 +2,7 @@
 
 if [ "$#" -lt "3" ]; then
     echo "usage:\n\t$0 in number displacement_max_corner"
-    echo "example toto.tiff 10 5" 
+    echo "example toto.tiff 10 5"
     exit 1
 fi
 
@@ -142,7 +142,7 @@ for noise in 0 5 10 30; do
                         for i in `seq 2 $NUMBER`; do
                             INi=`printf $INPAT_NOISY $i`
                             REGi=`printf $regpat_ica $i`
-                            cmd="SAVE=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+                            cmd="SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                             echo "$cmd"
                         done | parallel -j 32
                         end=`date +%s.%N`

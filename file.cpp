@@ -227,13 +227,13 @@ void read
 /**
  *
  *  Function to save the parameters in ascii format
- *  It creates a header with: nparams nx ny
- *  Then it stores the parameters 
+ *  It creates a header with: nparams
+ *  Then it stores the parameters
  *
  */
 void save
 (
-  const char *file, //output file name 
+  const char *file, //output file name
   double *p,        //parameters to be saved
   int nparams       //number of parameters
 ) 
