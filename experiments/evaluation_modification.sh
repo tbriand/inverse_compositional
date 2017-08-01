@@ -77,7 +77,7 @@ for noise in 0 5 10 30; do
             INi=`printf $INPAT $i`
             OUTi=`printf $INPAT_NOISY $i`
             echo "add_noise $noise $INi $OUTi"
-    done | parallel -j 3
+    done | parallel -j 32
 
     # SIFT + RANSAC estimation
         echo "SIFT + RANSAC estimation"
@@ -127,13 +127,14 @@ for noise in 0 5 10 30; do
         echo "ICA estimation"
         echo -e "\n ICA estimation" >> $global_results
         #for NORMALIZATION in 0 1; do
+        for SAVE in 0 1; do
         for FIRST_SCALE in 0 1; do
             for EDGEPADDING in 0 5; do
                 for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                     for ROBUST in 0 1 2 3 4; do
-                        echo "first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}"
-                        echo -e "\n first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}" >> $global_results
-                        basefile=scale${FIRST_SCALE}_edge${EDGEPADDING}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                        echo "save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}"
+                        echo -e "\n save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}" >> $global_results
+                        basefile=save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         regpat_ica=ica_${basefile}_%i.hom
 
                         # ICA estimation
@@ -141,9 +142,9 @@ for noise in 0 5 10 30; do
                         for i in `seq 2 $NUMBER`; do
                             INi=`printf $INPAT_NOISY $i`
                             REGi=`printf $regpat_ica $i`
-                            cmd="NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+                            cmd="SAVE=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                             echo "$cmd"
-                        done | parallel -j 3
+                        done | parallel -j 32
                         end=`date +%s.%N`
                         runtime=$(echo "$end - $start" | bc) 
                         echo "runtime $runtime seconds" >> $global_results
@@ -189,7 +190,7 @@ for noise in 0 5 10 30; do
                 done
             done
         done
-
+        done
     cd ..
 done
 

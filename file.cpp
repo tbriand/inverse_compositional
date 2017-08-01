@@ -8,14 +8,15 @@
 
 
 #include <stdio.h>
-
+#include <stdlib.h>
 #include "file.h"
 
 extern "C"
 {
 #include "iio.h"
 }
-
+#include "smapa.h"
+SMART_PARAMETER(SAVELONGER,1)
 
 /**
  *
@@ -240,7 +241,12 @@ void save
   FILE *fd=fopen(file,"w");
   fprintf(fd,"%d\n", nparams);
   for(int j=0; j<nparams; j++)
-    fprintf(fd,"%.14lg ", p[j]);
+  {
+    if( SAVELONGER() )
+      fprintf(fd,"%.14lg ", p[j]);
+    else
+      fprintf(fd,"%f ", p[j]);
+  }
   fprintf(fd,"\n");
   fclose(fd);
 }
