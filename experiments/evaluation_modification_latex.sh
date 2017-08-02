@@ -31,7 +31,7 @@ max_sift=max_sift.txt
 
     # RMSE std
     line2echo="Std"
-    for noise in 0 3 5 10; do
+    for noise in 0 5 10 30; do
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $rmse_sift 1`"
@@ -41,9 +41,9 @@ max_sift=max_sift.txt
     echo "$line2echo"
     echo "\\hline"
 
-    # RMSE
+    #Max
     line2echo="Max"
-    for noise in 0 3 5 10; do
+    for noise in 0 5 10 30; do
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $max_sift 0`"
@@ -54,7 +54,7 @@ max_sift=max_sift.txt
 
     # RMSE std
     line2echo="Std"
-    for noise in 0 3 5 10; do
+    for noise in 0 5 10 30; do
         dir=noise$noise
         cd $dir
         line2echo="$line2echo & `mean_and_std $max_sift 1`"
