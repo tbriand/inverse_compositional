@@ -76,7 +76,7 @@ max_sift=max_sift.txt
     for FIRST_SCALE in 0 1 2 3 4; do
         # loop over the noise level
         # echo "Starting the loop"
-        for noise in 0 5 10 30; do
+        for noise in 0 3 5 10 20 30 50; do
         #for noise in 0 3 5; do
             dir=noise$noise
             cd $dir
