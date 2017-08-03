@@ -22,7 +22,7 @@ interp=bicubic
 boundary=hsym
 base_out=burst
 transform=8 #homography
-create_burst $in $base_out $NUMBER $interp $boundary $L $transform
+#create_burst $in $base_out $NUMBER $interp $boundary $L $transform
 
 # the reference image is assumed to be the first image
 ref_number=1
@@ -76,7 +76,7 @@ for noise in 0 3 5 10 20 30 50; do
     for i in `seq 1 $NUMBER`; do
             INi=`printf $INPAT $i`
             OUTi=`printf $INPAT_NOISY $i`
-            echo "add_noise $noise $INi $OUTi"
+           # echo "add_noise $noise $INi $OUTi"
     done | parallel -j 32
 
     # SIFT + RANSAC estimation
@@ -128,70 +128,70 @@ for noise in 0 3 5 10 20 30 50; do
         echo -e "\n ICA estimation" >> $global_results
         #for NORMALIZATION in 0 1; do
         #for SAVE in 0 1; do
-        SAVE=1
-            for FIRST_SCALE in 0 1 2 3 4; do
-                for EDGEPADDING in 0 5; do
-                    for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                        for ROBUST in 0 1 2 3 4; do
-                            echo "save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}"
-                            echo -e "\n save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}" >> $global_results
-                            basefile=save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                            regpat_ica=ica_${basefile}_%i.hom
-
-                            # ICA estimation
-                            start=`date +%s.%N`
-                            for i in `seq 2 $NUMBER`; do
-                                INi=`printf $INPAT_NOISY $i`
-                                REGi=`printf $regpat_ica $i`
-                                cmd="SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
-                                echo "$cmd"
-                            done | parallel -j 32
-                            end=`date +%s.%N`
-                            runtime=$(echo "$end - $start" | bc) 
-                            echo "runtime $runtime seconds" >> $global_results
-
-                            # field comparison
-                            field_ica=field_ica_${basefile}_%i.tiff
-                            rmse_ica=rmse_ica_${basefile}.txt
-                            max_ica=max_ica_${basefile}.txt
-                            for i in `seq 2 $NUMBER`; do
-                                REGICAi=`printf $regpat_ica $i`
-                                REGi=`printf $TRUE_REGPAT $i`
-                                FIELDi=`printf $field_ica $i`
-                                compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
-                                compute rmse $centered $FIELDi >> $rmse_ica
-                                compute max $centered $FIELDi >> $max_ica
-                            done
-                            echo "Mean and std of the RMSE" >> $global_results
-                            mean_and_std $rmse_ica 2 >> $global_results
-                            echo "Mean and std of the MAX" >> $global_results
-                            mean_and_std $max_ica 2 >> $global_results
-
-                            # image resampling
-    #                         outpat_ica=ica_${basefile}_%i.tiff
-    #                         outpat_ica_noisy=ica_noisy_${basefile}_%i.tiff
-    #                         for i in `seq 2 $NUMBER`; do
-    #                             INi=`printf $INPAT $i`
-    #                             INNOISYi=`printf $INPAT_NOISY $i`
-    #                             REGi=`printf $TRUE_REGPAT $i`
-    #                             # ica
-    #                                 REGICAi=`printf $regpat_ica $i`
-    #                                 OUTi=`printf $outpat_ica $i`
-    #                                 synflow_global hom "`cat $REGICAi`" ../$in $OUTi /dev/null $zoom $interp /dev/null $boundary
-    #                                 diff2 $OUTi $INi $OUTi
-    #                                 crop 10 10 -10 -10 $OUTi $OUTi
-    #                             # ica noisy
-    #                                 REGICAi=`printf $regpat_ica $i`
-    #                                 OUTi=`printf $outpat_ica_noisy $i`
-    #                                 synflow_global hom "`cat $REGICAi`" $REF $OUTi /dev/null $zoom $interp /dev/null $boundary
-    #                                 diff2 $OUTi $INNOISYi $OUTi
-    #                                 crop 10 10 -10 -10 $OUTi $OUTi
-    #                         done
-                        done
-                    done
-                done
-            done
-        #done
+#        SAVE=1
+#            for FIRST_SCALE in 0 1 2 3 4; do
+#                for EDGEPADDING in 0 5; do
+#                    for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+#                        for ROBUST in 0 1 2 3 4; do
+#                            echo "save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}"
+#                            echo -e "\n save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST}" >> $global_results
+#                            basefile=save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+#                            regpat_ica=ica_${basefile}_%i.hom
+#
+#                            # ICA estimation
+#                            start=`date +%s.%N`
+#                            for i in `seq 2 $NUMBER`; do
+#                                INi=`printf $INPAT_NOISY $i`
+#                                REGi=`printf $regpat_ica $i`
+#                                cmd="SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+#                                echo "$cmd"
+#                            done | parallel -j 32
+#                            end=`date +%s.%N`
+#                            runtime=$(echo "$end - $start" | bc) 
+#                            echo "runtime $runtime seconds" >> $global_results
+#
+#                            # field comparison
+#                            field_ica=field_ica_${basefile}_%i.tiff
+#                            rmse_ica=rmse_ica_${basefile}.txt
+#                            max_ica=max_ica_${basefile}.txt
+#                            for i in `seq 2 $NUMBER`; do
+#                                REGICAi=`printf $regpat_ica $i`
+#                                REGi=`printf $TRUE_REGPAT $i`
+#                                FIELDi=`printf $field_ica $i`
+#                                compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
+#                                compute rmse $centered $FIELDi >> $rmse_ica
+#                                compute max $centered $FIELDi >> $max_ica
+#                            done
+#                            echo "Mean and std of the RMSE" >> $global_results
+#                            mean_and_std $rmse_ica 2 >> $global_results
+#                            echo "Mean and std of the MAX" >> $global_results
+#                            mean_and_std $max_ica 2 >> $global_results
+#
+#                            # image resampling
+#    #                         outpat_ica=ica_${basefile}_%i.tiff
+#    #                         outpat_ica_noisy=ica_noisy_${basefile}_%i.tiff
+#    #                         for i in `seq 2 $NUMBER`; do
+#    #                             INi=`printf $INPAT $i`
+#    #                             INNOISYi=`printf $INPAT_NOISY $i`
+#    #                             REGi=`printf $TRUE_REGPAT $i`
+#    #                             # ica
+#    #                                 REGICAi=`printf $regpat_ica $i`
+#    #                                 OUTi=`printf $outpat_ica $i`
+#    #                                 synflow_global hom "`cat $REGICAi`" ../$in $OUTi /dev/null $zoom $interp /dev/null $boundary
+#    #                                 diff2 $OUTi $INi $OUTi
+#    #                                 crop 10 10 -10 -10 $OUTi $OUTi
+#    #                             # ica noisy
+#    #                                 REGICAi=`printf $regpat_ica $i`
+#    #                                 OUTi=`printf $outpat_ica_noisy $i`
+#    #                                 synflow_global hom "`cat $REGICAi`" $REF $OUTi /dev/null $zoom $interp /dev/null $boundary
+#    #                                 diff2 $OUTi $INNOISYi $OUTi
+#    #                                 crop 10 10 -10 -10 $OUTi $OUTi
+#    #                         done
+#                        done
+#                    done
+#                done
+#            done
+#        #done
     cd ..
 done
 
