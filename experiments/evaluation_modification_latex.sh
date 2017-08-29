@@ -1,8 +1,15 @@
 #!/bin/bash
 
-# create directory
+
+if [ "$#" -lt "1" ]; then
 dir=evaluation_modification
+else
+dir=$1
+fi
+
+# change directory
 cd $dir
+
 #
 # # global file to store the result
 # global_results=latex_tables.txt
@@ -161,10 +168,9 @@ max_sift=max_sift.txt
             echo "\\caption{Noise level $noise with initial scale $FIRST_SCALE}"
             echo "\\end{center}"
             echo "\\end{table}"
-            
+
             cd ..
         done
     done
-  
-    
+
 cd ..
