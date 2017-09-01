@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-if [ "$#" -lt "1" ]; then
+# if [ "$#" -lt "1" ]; then
 dir=evaluation_modification
-else
-dir=$1
-fi
+# else
+# dir=$1
+# fi
 
 # change directory
 cd $dir
