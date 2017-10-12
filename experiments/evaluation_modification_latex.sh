@@ -112,7 +112,7 @@ max_sift=max_sift.txt
                 done
                 line2echo="$line2echo \\\\"
                 echo "$line2echo"
-                
+
                 #RMSE STD
                 line2echo="& Std"
                 for ROBUST in 0 1 2 3 4; do
@@ -126,7 +126,7 @@ max_sift=max_sift.txt
                 done
                 line2echo="$line2echo \\\\"
                 echo "$line2echo"
-                
+
                 #MAX
                 line2echo="& Max"
                 for ROBUST in 0 1 2 3 4; do
@@ -140,7 +140,7 @@ max_sift=max_sift.txt
                 done
                 line2echo="$line2echo \\\\"
                 echo "$line2echo"
-                
+
                 #RMSE STD
                 line2echo="& Std"
                 for ROBUST in 0 1 2 3 4; do
@@ -154,7 +154,7 @@ max_sift=max_sift.txt
                 done
                 line2echo="$line2echo \\\\"
                 echo "$line2echo"
-                
+
                 if [ "$ROBUST_GRADIENT" -eq "5" ]; then 
                     echo "& Time & v1 & v2 & v3 & v4 & v5 & v6 & v7 & v8 & v9 & v10"
                 else
@@ -163,7 +163,7 @@ max_sift=max_sift.txt
                 fi
                 ROBUST_GRADIENT=$(($ROBUST_GRADIENT + 1))
             done
-            
+
             echo "\\end{tabular}"
             echo "\\caption{Noise level $noise with initial scale $FIRST_SCALE}"
             echo "\\end{center}"

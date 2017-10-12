@@ -8,7 +8,7 @@ fi
 n=$1
 L=$2
 
-rm -rf evaluation_modification 
+rm -rf evaluation_modification
 
 img=../input/homography2.png
 dir=fruit
