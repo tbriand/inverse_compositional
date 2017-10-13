@@ -39,7 +39,7 @@
 #include "smapa.h"
 SMART_PARAMETER(EDGEPADDING,5)     //to discard boundary pixels (valued as NAN)
 SMART_PARAMETER(NORMALIZATION,0)   //to normalize the position
-SMART_PARAMETER(ROBUST_GRADIENT,2) //choice of the robust gradient
+SMART_PARAMETER(ROBUST_GRADIENT,3) //choice of the robust gradient
 
 /**
  *

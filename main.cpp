@@ -28,6 +28,9 @@
 #define PAR_DEFAULT_OUTFILE "transform.mat"
 #define PAR_DEFAULT_FIRST_SCALE 0
 
+#include "smapa.h"
+SMART_PARAMETER(GRAYMETHOD,0)  
+
 /**
  *
  *  Print a help message 
@@ -166,6 +169,30 @@ int read_parameters(
   return 1;
 }
 
+/**
+  *
+  *  Function to convert an rgb image to grayscale levels
+  * 
+**/
+void rgb2gray(
+  double *rgb,  //input color image
+  double *gray, //output grayscale image
+  int nx,       //number of pixels
+  int ny, 
+  int nz
+)
+{
+  int size=nx*ny;
+  if(nz>=3)
+    //#pragma omp parallel for
+    for(int i=0;i<size;i++)
+      gray[i]=(0.2989*rgb[i*nz]+0.5870*rgb[i*nz+1]+0.1140*rgb[i*nz+2]);
+  else
+    //#pragma omp parallel for
+    for(int i=0;i<size;i++)
+      gray[i]=rgb[i];
+  
+}
 
 /**
  *
@@ -226,24 +253,53 @@ int main (int argc, char *argv[])
 
       //allocate memory for the parametric model
       double *p=new double[nparams];
-
-      //compute the optic flow
-      const clock_t begin = clock();
-      pyramidal_inverse_compositional_algorithm(
-        I1, I2, p, nparams, nx, ny, nz, 
-        nscales, zfactor, TOL, robust, lambda, verbose, first_scale
-      );
       
-      if(verbose) 
-        printf("Time=%f\n", double(clock()-begin)/CLOCKS_PER_SEC);
+      if( GRAYMETHOD() ) {
+        //convert images to grayscale
+        double *I1g=new double[nx*ny];
+        double *I2g=new double[nx*ny];
+      
+        rgb2gray(I1, I1g, nx, ny, nz);
+        rgb2gray(I2, I2g, nx, ny, nz);
+        
+        //free memory
+        free (I1);
+        free (I2);
+        
+        //compute the optic flow
+        const clock_t begin = clock();
+        pyramidal_inverse_compositional_algorithm(
+           I1g, I2g, p, nparams, nx, ny, 1, 
+        nscales, zfactor, TOL, robust, lambda, verbose, first_scale
+        );
+      
+        if(verbose) 
+           printf("Time=%f\n", double(clock()-begin)/CLOCKS_PER_SEC);
+        
+        //free memory
+        delete[]I1g;          
+        delete[]I2g;
+      }
+      else {
+        //compute the optic flow
+        const clock_t begin = clock();
+        pyramidal_inverse_compositional_algorithm(
+           I1, I2, p, nparams, nx, ny, nz, 
+        nscales, zfactor, TOL, robust, lambda, verbose, first_scale
+        );
+      
+        if(verbose) 
+           printf("Time=%f\n", double(clock()-begin)/CLOCKS_PER_SEC);
+        //free memory
+        free (I1);
+        free (I2);  
+      }
       
       //save the parametric model to disk
       save(outfile, p, nparams);
 
       //free memory
-      free (I1);
-      free (I2);
-      delete[]p;          
+      delete[]p;
     }
     else 
     {
