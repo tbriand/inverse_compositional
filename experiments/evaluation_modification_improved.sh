@@ -10,7 +10,7 @@ in=$1
 NUMBER=$2
 L=$3
 
-if [ ! -s "$NTHREADS" ]; then
+if [ -z "$NTHREADS" ]; then
     NTHREADS=1
 fi
 
@@ -130,7 +130,7 @@ for noise in 0 3 5 10 20 30 50; do
                             field_ica=field_ica_${basefile}_%i.tiff
                             rmse_ica=rmse_ica_${basefile}.txt
                             max_ica=max_ica_${basefile}.txt
-                            
+
                             # ICA estimation
                             start=`date +%s.%N`
                             for i in `seq 2 $NUMBER`; do
