@@ -183,7 +183,7 @@ void rgb2gray(
 )
 {
   int size=nx*ny;
-  if(nz>=3)
+  if( nz==3 )
     //#pragma omp parallel for
     for(int i=0;i<size;i++)
       gray[i]=(0.2989*rgb[i*nz]+0.5870*rgb[i*nz+1]+0.1140*rgb[i*nz+2]);
@@ -254,7 +254,7 @@ int main (int argc, char *argv[])
       //allocate memory for the parametric model
       double *p=new double[nparams];
       
-      if( GRAYMETHOD() ) {
+      if( GRAYMETHOD() && nz==3 ) {
         //convert images to grayscale
         double *I1g=new double[nx*ny];
         double *I2g=new double[nx*ny];

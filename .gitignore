@@ -3,3 +3,5 @@
 add_noise
 generate_output
 inverse_compositional_algorithm
+experiments/*.txt
+experiments/evaluation_modification_old/
