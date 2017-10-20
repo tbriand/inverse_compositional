@@ -59,7 +59,7 @@ SAVE=1          #saving with good precision is necessary
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
             for ROBUST in 0 1 2 3 4; do
@@ -83,18 +83,18 @@ SAVE=1          #saving with good precision is necessary
                         line2echo="$line2echo & `cat $time_ica`"
                     done
             done
-            if [ ! "$noise" -eq "50" ]; do 
+            if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
-            done
+            fi
             echo "$line2echo"
-            done
+
             cd ..
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the color handling}"
     echo "\\end{center}"
     echo "\\end{table}"
-    
+
 # ICA DBP
     echo ""
     FIRST_SCALE=0
@@ -110,7 +110,7 @@ SAVE=1          #saving with good precision is necessary
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
             for ROBUST in 0 1 2 3 4; do
@@ -134,11 +134,10 @@ SAVE=1          #saving with good precision is necessary
                         line2echo="$line2echo & `cat $time_ica`"
                     done
             done
-            if [ ! "$noise" -eq "50" ]; do 
+            if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
-            done
+            fi
             echo "$line2echo"
-            done
 
             cd ..
     done
@@ -181,12 +180,11 @@ SAVE=1          #saving with good precision is necessary
                 time_ica=time_ica_${basefile}.txt
                 line2echo="$line2echo & `cat $time_ica`"
             done
-            if [ ! "$noise" -eq "50" ]; do 
+            if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
-            done
+            fi
             echo "$line2echo"
-            done
-            
+
             cd ..
     done
     echo "\\end{tabular}"
@@ -209,7 +207,7 @@ SAVE=1          #saving with good precision is necessary
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
             for FIRST_SCALE in 0 1 2 3; do
@@ -229,11 +227,10 @@ SAVE=1          #saving with good precision is necessary
                 time_ica=time_ica_${basefile}.txt
                 line2echo="$line2echo & `cat $time_ica`"
             done
-            if [ ! "$noise" -eq "50" ]; do 
+            if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
-            done
+            fi
             echo "$line2echo"
-            done
 
             cd ..
     done
@@ -252,14 +249,14 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{}  $ SIFT + RANSAC  &  IC & IC optimized $ \\\\"
+    echo "\\multicolumn{2}{l|}{} & SIFT + RANSAC & IC & IC optimized \\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
             #sift
@@ -285,9 +282,9 @@ SAVE=1          #saving with good precision is necessary
 
             #ic optimized
             line2echo="$line2echo & ?"
-            if [ ! "$noise" -eq "50" ]; do 
+            if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
-            done
+            fi
             echo "$line2echo"
 
             cd ..
