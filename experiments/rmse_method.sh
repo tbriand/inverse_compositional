@@ -9,6 +9,9 @@ noise=$1
 NUMBER=$2
 L=$3
 
+if [ -z "$NTHREADS" ]; then
+    NTHREADS=1
+fi
 if [ -z "$GRAYMETHOD" ]; then
     GRAYMETHOD=1
 fi
@@ -44,7 +47,7 @@ interp=bicubic
 boundary=hsym
 base_out=burst
 transform=8 #homography
-create_burst $in $base_out $NUMBER $interp $boundary $L $transform
+# create_burst $in $base_out $NUMBER $interp $boundary $L $transform
 
 # comparison fields
 centered=0
@@ -53,15 +56,16 @@ h=`imprintf %h $in`
 opt=1 # to determine if comparison has h1-h2 (1) or h2^-1 o h1 - id (0)
 
 for i in `seq 1 $NUMBER`; do
-    add_noise $noise ${base_out}_$i.tiff ${base_out}_$i.tiff
-done
+    echo "add_noise $noise ${base_out}_$i.tiff ${base_out}_noisy_$i.tiff"
+done | parallel -j $NTHREADS
 
-REF=${base_out}_1.tiff
+REF=${base_out}_noisy_1.tiff
 start=`date +%s.%N`
 for i in `seq 2 $NUMBER`; do
-    INi=${base_out}_$i.tiff
+    INi=${base_out}_noisy_$i.tiff
     REGi=${base_out}_estimated_$i.hom
     GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVELONGER EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
+    rm $INi
 done
 end=`date +%s.%N`
 runtime=$(echo "$end - $start" | bc) 
