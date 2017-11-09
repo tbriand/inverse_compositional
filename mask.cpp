@@ -29,7 +29,7 @@ mask3x3 (double *input,         //input image
          double *output,        //output image
          int nx,                //image width
          int ny,                //image height
-         int nz,                // number of color channels in the image 
+         int nz,                // number of color channels in the image
          double *mask           //mask to be applied
   )
 {
@@ -173,7 +173,7 @@ gradient (double *input,        //input image
           double *dy,           //computed y derivative
           int nx,               //image width
           int ny,               //image height
-          int nz                //number of color channels in the image 
+          int nz                //number of color channels in the image
   )
 {
   int nx_rgb = nx * nz;
@@ -270,12 +270,12 @@ gaussian (
 )
 {
   int i, j, k;
-  
+
   double den = 2 * sigma * sigma;
   int size = (int) (precision * sigma) + 1;
   int bdx = xdim + size;
   int bdy = ydim + size;
-  
+
   if (bc && size > xdim){
       printf("GaussianSmooth: sigma too large for this bc\n");
       throw 1;
@@ -297,17 +297,17 @@ gaussian (
 
   for (int i = 0; i < size; i++)
     B[i] /= norm;
-  
-  double *R = new double[size + xdim + size]; 
+
+  double *R = new double[size + xdim + size];
   double *T = new double[size + ydim + size];
-  
+
   //Loop for every channel
   for(int index_color = 0; index_color < zdim; index_color++){
-  
+
   //convolution of each line of the input image
    for (k = 0; k < ydim; k++)
     {
-      for (i = size; i < bdx; i++) 
+      for (i = size; i < bdx; i++)
         R[i] = I[(k * xdim + i - size) * zdim + index_color];
       switch (bc)
         {
@@ -341,7 +341,7 @@ gaussian (
             sum += B[j] * (R[i - j] + R[i + j]);
 
           I[(k * xdim + i - size) * zdim + index_color] = sum;
-          
+
         }
     }
 
@@ -384,7 +384,7 @@ gaussian (
         }
     }
   }
-  
+
   delete[]B;
   delete[]R;
   delete[]T;
@@ -409,26 +409,26 @@ convolution_rows (
   )
 {
   int i, j, k;
-  
+
   // kernel is of the form [ lpadding values, center, rpadding values ]
   int kcenter = (kdim - 1)/2;
   int lpadding = kcenter;
   int rpadding = kdim/2;
-  
+
   // buffer taking into account the boundary condition
   int Bdim = lpadding + xdim + rpadding;
   double *B = new double[Bdim];
 
   // position of the boundaries in the buffer
   int bdx = xdim + lpadding;
-  
+
   //Loop for every channel
   for(int index_color = 0; index_color < zdim; index_color++){
-  
+
     //convolution of each line of the input image
     for (k = 0; k < ydim; k++) {
       // construct buffer for the line k
-      for (i = lpadding; i < bdx; i++) 
+      for (i = lpadding; i < bdx; i++)
         B[i] = I[(k * xdim + i - lpadding) * zdim + index_color];
       switch (bc)
         {
@@ -436,34 +436,34 @@ convolution_rows (
           for (i = 0; i < lpadding; i++)
             B[i] = 0;
           for (j = bdx; j < Bdim; j++)
-            B[j] = 0;  
+            B[j] = 0;
           break;
         case 1: //Reflecting boundary conditions (wsym)
           for (i = 0; i < lpadding; i++)
               B[i] = I[(k * xdim + lpadding - i ) * zdim + index_color];
-          for (j = bdx; j < Bdim; j++) 
+          for (j = bdx; j < Bdim; j++)
               B[j] = I[(k * xdim + xdim + bdx - j - 2) * zdim + index_color ];
           break;
         case 2: //Periodic boundary conditions
           for (i = 0; i < lpadding; i++)
               B[i] = I[(k * xdim + xdim - lpadding + i) * zdim + index_color];
-          for (j = bdx; j < Bdim; j++) 
+          for (j = bdx; j < Bdim; j++)
               B[j] = I[(k * xdim + j - bdx) * zdim + index_color];
           break;
         }
-      
+
       // convolution of the line k
       for (i = lpadding; i < bdx; i++) {
           double sum = 0;
           for (int j = 0; j < kdim; j++)
             sum += B[i-lpadding+j]*kernel[j];
-          
+
           // update I
           I[(k * xdim + i - lpadding) * zdim + index_color] = sum;
       }
     }
   }
-  
+
   delete[]B;
 }
 
@@ -485,26 +485,26 @@ convolution_columns (
   )
 {
   int i, j, k;
-  
+
   // kernel is of the form [ lpadding values, center, rpadding values ]
   int kcenter = (kdim - 1)/2;
   int lpadding = kcenter;
   int rpadding = kdim/2;
-  
+
   // buffer taking into account the boundary condition
   int Bdim = lpadding + ydim + rpadding;
   double *B = new double[Bdim];
 
   // position of the boundaries in the buffer
   int bdy = ydim + lpadding;
-  
+
   //Loop for every channel
   for(int index_color = 0; index_color < zdim; index_color++){
-  
+
     //convolution of each column of the input image
     for (k = 0; k < xdim; k++) {
       // construct buffer for the column k
-      for (i = lpadding; i < bdy; i++) 
+      for (i = lpadding; i < bdy; i++)
         B[i] = I[((i - lpadding) * xdim + k) * zdim + index_color];
       switch (bc)
         {
@@ -512,41 +512,41 @@ convolution_columns (
           for (i = 0; i < lpadding; i++)
             B[i] = 0;
           for (j = bdy; j < Bdim; j++)
-            B[j] = 0;  
+            B[j] = 0;
           break;
         case 1: //Reflecting boundary conditions
           for (i = 0; i < lpadding; i++)
               B[i] = I[((lpadding - i) * xdim + k ) * zdim + index_color];
-          for (j = bdy; j < Bdim; j++) 
+          for (j = bdy; j < Bdim; j++)
               B[j] = I[((bdy + ydim - j - 2) * xdim + k) * zdim + index_color ];
           break;
         case 2: //Periodic boundary conditions
           for (i = 0; i < lpadding; i++)
               B[i] = I[((ydim - lpadding + i) * xdim + k) * zdim + index_color];
-          for (j = bdy; j < Bdim; j++) 
+          for (j = bdy; j < Bdim; j++)
               B[j] = I[((j - bdy) * xdim + k) * zdim + index_color];
           break;
         }
-      
+
       // convolution of the line k
       for (i = lpadding; i < bdy; i++) {
           double sum = 0;
           for (int j = 0; j < kdim; j++)
             sum += B[i-lpadding+j]*kernel[j];
-          
+
           // update I
           I[((i - lpadding) * xdim + k) * zdim + index_color] = sum;
       }
     }
   }
-  
+
   delete[]B;
 }
 
 /* Definition of the gradient estimators */
 //Central
 static double kCentral[3] = {0.0, 1.0, 0.0};
-static double dCentral[3] = {-1.0, 0.0, 1.0};
+static double dCentral[3] = {-0.5, 0.0, 0.5};
 
 //Hypomode
 static double kHypomode[2] = {0.5, 0.5};
@@ -584,7 +584,7 @@ static gradientStruct gradientTable[] = {
  * dx = d * k^t * I
  * dy = k * d^t * I
  * where * denotes the convolution operator
- * 
+ *
  */
 void
 gradient_robust (double *input, //input image
@@ -593,7 +593,7 @@ gradient_robust (double *input, //input image
           int nx,               //image width
           int ny,               //image height
           int nz,               //number of color channels in the image
-          int gradientType      //type of gradient 
+          int gradientType      //type of gradient
   )
 {
   //kernel definition
@@ -602,37 +602,37 @@ gradient_robust (double *input, //input image
   double *differentiator = gradientTable[gradientType].d;
   int nkernel = gradientTable[gradientType].size;
   int bc = 1;
-  
+
   //initialization
   for(int i = 0; i < nx*ny*nz; i++)
     dx[i] = dy[i] = input[i];
-  
+
   //x derivative computation
     //convolution of each column (k^t * I)
-    convolution_columns(dx, nx, ny , nz, kernel, nkernel, bc);  
-    
+    convolution_columns(dx, nx, ny , nz, kernel, nkernel, bc);
+
     //convolution of each line (d * (k^t * I))
     convolution_rows(dx, nx, ny , nz, differentiator, nkernel, bc);
-    
+
   //y derivative computation
     //convolution of each column (d^t * I)
-    convolution_columns(dy, nx, ny , nz, differentiator, nkernel, bc);  
-    
+    convolution_columns(dy, nx, ny , nz, differentiator, nkernel, bc);
+
     //convolution of each line (k * (d^t * dx))
     convolution_rows(dy, nx, ny , nz, kernel, nkernel, bc);
 }
 
 /**
  *
- * Prefiltering of an image  
- * 
+ * Prefiltering of an image
+ *
  */
 void
 prefiltering_robust (
           double *I,            //input/output image
           int nx,               //image width
           int ny,               //image height
-          int nz,               //number of color channels in the image 
+          int nz,               //number of color channels in the image
           int gradientType      //type of gradient
 )
 {
@@ -640,11 +640,11 @@ prefiltering_robust (
   assert(gradientType < (int) NUMEL(gradientTable));
   double *kernel = gradientTable[gradientType].k;
   int nkernel = gradientTable[gradientType].size;
-  int bc = 1;  
-  
+  int bc = 1;
+
   //convolution of each line of the input image
   convolution_rows(I, nx, ny , nz, kernel, nkernel, bc);
-  
+
   //convolution of each column of the input image
   convolution_columns(I, nx, ny , nz, kernel, nkernel, bc);
 }

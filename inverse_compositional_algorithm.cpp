@@ -6,8 +6,8 @@
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
-/** 
-  * 
+/**
+  *
   *  This code implements the 'inverse compositional algorithm' proposed in
   *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A 
   *         unifying framework. International Journal of Computer Vision, 
@@ -15,11 +15,11 @@
   *     [2] S. Baker, R. Gross, I. Matthews, and T. Ishikawa. (2004). 
   *         Lucas-kanade 20 years on: A unifying framework: Part 2. 
   *         International Journal of Computer Vision, 56(3), 221-255.
-  *  
+  *
   *  This implementation is for color images. It calculates the global 
   *  transform between two images. It uses robust error functions and a 
   *  coarse-to-fine strategy for computing large displacements
-  * 
+  *
 **/
 
 //July 2017
@@ -124,12 +124,12 @@ void hessian
   int nx,      //number of columns
   int ny,      //number of rows
   int nz       //number of channels
-) 
+)
 {
   //initialize the hessian to zero
   for(int k=0; k<nparams*nparams; k++)
     H[k] = 0;
- 
+
   //calculate the hessian in a neighbor window
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++) {
@@ -154,7 +154,7 @@ void hessian
   int nx,      //number of columns
   int ny,      //number of rows
   int nz       //number of channels
-) 
+)
 {
   //initialize the hessian to zero
   for(int k=0; k<nparams*nparams; k++)
@@ -181,7 +181,7 @@ void inverse_hessian
   double *H,   //input Hessian
   double *H_1, //output inverse Hessian 
   int nparams  //number of parameters
-) 
+)
 {
   if(inverse(H, H_1, nparams)==-1) 
     //if the matrix is not invertible, set parameters to 0
@@ -369,14 +369,14 @@ void inverse_compositional_algorithm(
   double *H  =new double[size3];   //Hessian matrix
   double *H_1=new double[size3];   //inverse Hessian matrix
 
-   
+
   //Evaluate the gradient of I1
   //Do not prefilter if central differences are used
   if ( ROBUST_GRADIENT() )
     gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
   else
     gradient(I1, Ix, Iy, nx, ny, nz);
-  
+
   //Discard boundary pixels
   for (int index_color = 0; index_color < nz; index_color++) {
       for (int i = 0; i < ny; i++) {
@@ -389,11 +389,11 @@ void inverse_compositional_algorithm(
           }
       }
   }
-  
+
   //Evaluate the Jacobian
   if( NORMALIZATION() )
     jacobian_normalized(J, nparams, nx, ny, normalization_factor);
-  else 
+  else
     jacobian(J, nparams, nx, ny);
 
   //Compute the steepest descent images
@@ -413,8 +413,8 @@ void inverse_compositional_algorithm(
   //Iterate
   double error=1E10;
   int niter=0;
- 
-  do{     
+
+  do{
     //Warp image I2
     bicubic_interpolation(I2, Iw, p, nparams, nx, ny, nz);
 
@@ -448,7 +448,7 @@ void inverse_compositional_algorithm(
     niter++;    
   }
   while(error>TOL && niter<MAX_ITER);
-  
+
   //delete allocated memory
   delete []DI;
   delete []Ix;
@@ -466,9 +466,9 @@ void inverse_compositional_algorithm(
 
 /**
   *
-  *  Inverse compositional algorithm 
+  *  Inverse compositional algorithm
   *  Version with robust error functions
-  * 
+  *
 **/
 void robust_inverse_compositional_algorithm(
   double *I1,    //first image

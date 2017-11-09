@@ -18,14 +18,17 @@ fi
 if [ -z "$SAVELONGER" ]; then
     SAVELONGER=1
 fi
+if [ -z "NANIFOUTSIDE" ]; then
+	NANIFOUTSIDE=1
+fi
 if [ -z "$EDGEPADDING" ]; then
     EDGEPADDING=5
 fi
 if [ -z "$ROBUST_GRADIENT" ]; then
     ROBUST_GRADIENT=3
 fi
-if [ -z "$SCALES" ]; then
-    SCALES=5
+if [ -z "$NSCALES" ]; then
+    NSCALES=5
 fi
 if [ -z "$ROBUST" ]; then
     ROBUST=4
@@ -64,7 +67,7 @@ start=`date +%s.%N`
 for i in `seq 2 $NUMBER`; do
     INi=${base_out}_noisy_$i.tiff
     REGi=${base_out}_estimated_$i.hom
-    GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVELONGER EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$EDGEPADDING ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
+    GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVELONGER EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $NSCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE
     rm $INi
 done
 end=`date +%s.%N`

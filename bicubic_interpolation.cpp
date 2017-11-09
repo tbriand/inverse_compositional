@@ -14,12 +14,12 @@
 
 #include "bicubic_interpolation.h"
 #include "transformation.h"
-#include <cmath> 
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "smapa.h"
-SMART_PARAMETER(NANIFOUTSIDE,1) //set values to 0 if 0 and NAN if 1
+SMART_PARAMETER(NANIFOUTSIDE,1) //set boundary pixels values to 0 if 0 and NAN if 1
 SMART_PARAMETER(EDGEPADDING,5)  //control the width of discarded values
 
 /**
@@ -83,7 +83,7 @@ bicubic_interpolation(
 
 /**
   *
-  * Compute the bicubic interpolation of a point in an image. 
+  * Compute the bicubic interpolation of a point in an image.
   * Detects if the point goes outside the image domain
   *
 **/
@@ -115,15 +115,17 @@ bicubic_interpolation(
   ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
 
   // Discard values if too close to the boundary
-  if ( EDGEPADDING() ) {
+  if ( border_out ) {
     if ( uu < EDGEPADDING() || uu > nx-1-EDGEPADDING()
          || vv < EDGEPADDING() || vv > ny-1-EDGEPADDING() )
       out = true;
   }
 
   if (out && border_out) {
-    if (NANIFOUTSIDE()) return NAN;
-    else return 0;
+    if ( NANIFOUTSIDE() )
+	return NAN;
+    else
+	return 0;
   }
   else
     {
@@ -149,7 +151,7 @@ bicubic_interpolation(
       double p44 = input[(ddx + nx * ddy) * nz + k];
 
       //create array
-      double pol[4][4] = { 
+      double pol[4][4] = {
         {p11, p21, p31, p41}, {p12, p22, p32, p42},
         {p13, p23, p33, p43}, {p14, p24, p34, p44}
       };
@@ -173,7 +175,7 @@ void bicubic_interpolation(
   int nparams,     //number of parameters of the transform
   int nx,          //width of the image
   int ny,          //height of the image
-  int nz,          //number of channels of the image       
+  int nz,          //number of channels of the image
   bool border_out  //if true, put zeros outside the region
 )
 {
@@ -185,7 +187,7 @@ void bicubic_interpolation(
 
       //transform coordinates using the parametric model
       project(j, i, params, x, y, nparams);
-      
+
       //obtain the bicubic interpolation at position (uu, vv)
       for(int k=0; k<nz; k++)
         output[p*nz+k]=bicubic_interpolation(
