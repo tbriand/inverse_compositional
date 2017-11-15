@@ -87,7 +87,7 @@ for noise in 0 3 5 10 20 30 50; do
             FIELDi=`printf $field_sift $i`
             compare_homography $w $h "`cat $REGSIFTi`" "`cat $REGi`" $FIELDi $opt
             compute rmse $centered $FIELDi >> $rmse_sift
-            compute max $centered $FIELDi >> $max_sift
+            #compute max $centered $FIELDi >> $max_sift
             rm $FIELDi $REGSIFTi
         done
 #         echo "Mean and std of the RMSE" >> $global_results
@@ -117,8 +117,78 @@ for noise in 0 3 5 10 20 30 50; do
 #         done
 
     # ICA
+        c=`imprintf %c $REF`
         echo "ICA estimation"
-        for GRAYMETHOD in 0 1; do
+        if [ "$c" -eq "3" ]; then
+            for GRAYMETHOD in 0 1; do
+                for FIRST_SCALE in 0 1 2 3; do
+                    for EDGEPADDING in 0 5; do
+                        for NANIFOUTSIDE in 0 1; do
+                            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+                                for ROBUST in 0 1 2 3 4; do
+                                    echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
+                                    basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                                    regpat_ica=ica_${basefile}_%i.hom
+                                    time_ica=time_ica_${basefile}.txt
+                                    field_ica=field_ica_${basefile}_%i.tiff
+                                    rmse_ica=rmse_ica_${basefile}.txt
+                                    max_ica=max_ica_${basefile}.txt
+
+                                    # ICA estimation
+                                    start=`date +%s.%N`
+                                    for i in `seq 2 $NUMBER`; do
+                                        INi=`printf $INPAT_NOISY $i`
+                                        REGi=`printf $regpat_ica $i`
+                                        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+                                        echo "$cmd"
+                                    done | parallel -j $NTHREADS
+                                    end=`date +%s.%N`
+                                    runtime=$(echo "$end - $start" | bc) 
+                                    echo "$runtime" > $time_ica
+
+                                    # field comparison
+                                    for i in `seq 2 $NUMBER`; do
+                                        REGICAi=`printf $regpat_ica $i`
+                                        REGi=`printf $TRUE_REGPAT $i`
+                                        FIELDi=`printf $field_ica $i`
+                                        compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
+                                        compute rmse $centered $FIELDi >> $rmse_ica
+                                        #compute max $centered $FIELDi >> $max_ica
+                                        rm $FIELDi $REGICAi
+                                    done
+        #                             echo "Mean and std of the RMSE" >> $global_results
+        #                             mean_and_std $rmse_ica 2 >> $global_results
+        #                             echo "Mean and std of the MAX" >> $global_results
+        #                             mean_and_std $max_ica 2 >> $global_results
+            #
+            #                            # image resampling
+            #    #                         outpat_ica=ica_${basefile}_%i.tiff
+            #    #                         outpat_ica_noisy=ica_noisy_${basefile}_%i.tiff
+            #    #                         for i in `seq 2 $NUMBER`; do
+            #    #                             INi=`printf $INPAT $i`
+            #    #                             INNOISYi=`printf $INPAT_NOISY $i`
+            #    #                             REGi=`printf $TRUE_REGPAT $i`
+            #    #                             # ica
+            #    #                                 REGICAi=`printf $regpat_ica $i`
+            #    #                                 OUTi=`printf $outpat_ica $i`
+            #    #                                 synflow_global hom "`cat $REGICAi`" ../$in $OUTi /dev/null $zoom $interp /dev/null $boundary
+            #    #                                 diff2 $OUTi $INi $OUTi
+            #    #                                 crop 10 10 -10 -10 $OUTi $OUTi
+            #    #                             # ica noisy
+            #    #                                 REGICAi=`printf $regpat_ica $i`
+            #    #                                 OUTi=`printf $outpat_ica_noisy $i`
+            #    #                                 synflow_global hom "`cat $REGICAi`" $REF $OUTi /dev/null $zoom $interp /dev/null $boundary
+            #    #                                 diff2 $OUTi $INNOISYi $OUTi
+            #    #                                 crop 10 10 -10 -10 $OUTi $OUTi
+            #    #                         done
+                                done
+                            done
+                        done
+                    done
+                done
+            done
+    else
+        GRAYMETHOD=0
             for FIRST_SCALE in 0 1 2 3; do
                 for EDGEPADDING in 0 5; do
                     for NANIFOUTSIDE in 0 1; do
@@ -151,7 +221,7 @@ for noise in 0 3 5 10 20 30 50; do
                                     FIELDi=`printf $field_ica $i`
                                     compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
                                     compute rmse $centered $FIELDi >> $rmse_ica
-                                    compute max $centered $FIELDi >> $max_ica
+                                    #compute max $centered $FIELDi >> $max_ica
                                     rm $FIELDi $REGICAi
                                 done
     #                             echo "Mean and std of the RMSE" >> $global_results
@@ -184,8 +254,8 @@ for noise in 0 3 5 10 20 30 50; do
                     done
                 done
             done
-        done
-
+    fi
+            
     #clean
     for i in `seq 1 $NUMBER`; do
             OUTi=`printf $INPAT_NOISY $i`
