@@ -125,7 +125,8 @@ for noise in 0 3 5 10 20 30 50; do
                     for EDGEPADDING in 0 5; do
                         for NANIFOUTSIDE in 0 1; do
                             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                                for ROBUST in 0 1 2 3 4; do
+                                #for ROBUST in 0 1 2 3 4; do
+                                for ROBUST in 0 3; do
                                     echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
                                     basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                                     regpat_ica=ica_${basefile}_%i.hom
@@ -193,7 +194,8 @@ for noise in 0 3 5 10 20 30 50; do
                 for EDGEPADDING in 0 5; do
                     for NANIFOUTSIDE in 0 1; do
                         for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                            for ROBUST in 0 1 2 3 4; do
+                            #for ROBUST in 0 1 2 3 4; do
+                            for ROBUST in 0 3; do
                                 echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
                                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                                 regpat_ica=ica_${basefile}_%i.hom
