@@ -11,13 +11,6 @@
 #ifndef BICUBIC_INTERPOLATION_H
 #define BICUBIC_INTERPOLATION_H
 
-
-/**
-  *
-  * Compute the bicubic interpolation of a point in an image. 
-  * Detects if the point goes outside the image domain
-  *
-**/
 double
 bicubic_interpolation(
   double *input,//image to be interpolated
@@ -26,10 +19,8 @@ bicubic_interpolation(
   int nx,       //width of the image
   int ny,       //height of the image
   int nz,       //number of channels of the image
-  int k,        //actual channel
-  bool border_out = false //if true, put zeros outside the region
+  int k         //actual channel
 );
-
 
 /**
   *
@@ -43,8 +34,7 @@ void bicubic_interpolation(
   int nparams,          //number of parameters of the transform
   int nx,               //width of the image
   int ny,               //height of the image
-  int nz,               //number of channels of the image       
-  bool border_out=true  //if true, put zeros outside the region
+  int nz                //number of channels of the image       
 );
 
 

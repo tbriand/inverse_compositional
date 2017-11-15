@@ -13,13 +13,13 @@ if [ -z "$NTHREADS" ]; then
     NTHREADS=1
 fi
 if [ -z "$GRAYMETHOD" ]; then
-    GRAYMETHOD=1
+    GRAYMETHOD=0
 fi
 if [ -z "$SAVELONGER" ]; then
     SAVELONGER=1
 fi
 if [ -z "NANIFOUTSIDE" ]; then
-	NANIFOUTSIDE=1
+    NANIFOUTSIDE=1
 fi
 if [ -z "$EDGEPADDING" ]; then
     EDGEPADDING=5
@@ -46,11 +46,13 @@ cd $dir
 
 # create burst
 in=~/images/homography2.png
+#in=~/images/lena_nb.png
+
 interp=bicubic
 boundary=hsym
 base_out=burst
 transform=8 #homography
-# create_burst $in $base_out $NUMBER $interp $boundary $L $transform
+create_burst $in $base_out $NUMBER $interp $boundary $L $transform
 
 # comparison fields
 centered=0

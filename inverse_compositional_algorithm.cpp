@@ -164,7 +164,7 @@ void hessian
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++) {
       //Discarded if NAN
-      if ( std::isfinite(rho[i*nx+j]) &&  std::isfinite(DIJ[(i*nx+j)*nz*nparams])) 
+      if ( std::isfinite(rho[i*nx+j]) && std::isfinite(DIJ[(i*nx+j)*nz*nparams])) 
         sAtA(rho[i*nx+j], &(DIJ[(i*nx+j)*nz*nparams]), H, nz, nparams);
     }
 }
@@ -225,22 +225,17 @@ void robust_error_function
   int nz        //number of channels
 ) 
 {
-  for(int i=0;i<ny;i++) {
-    for(int j=0;j<nx;j++)
-    {
-      if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
-        rho[i*nx+j] = NAN; //Discard if too close to the boundary
+      for(int i=0;i<ny;i++) {
+          for(int j=0;j<nx;j++) {
+              if ( DI[(i*nx+j)*nz+0] == NAN)
+                  rho[i*nx+j] = NAN; // Already discarded for I2
+              else {
+                  double norm=0.0;
+                  for(int c=0;c<nz;c++) norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
+                  rho[i*nx+j]=rhop(norm,lambda,type);
+              }
+          }
       }
-      else {
-      	if ( DI[(i*nx+j)*nz+0] == NAN) rho[i*nx+j] = NAN; //Already discarded
-        else {
-	  double norm=0.0;
-          for(int c=0;c<nz;c++) norm+=DI[(i*nx+j)*nz+c]*DI[(i*nx+j)*nz+c];
-          rho[i*nx+j]=rhop(norm,lambda,type);
-	}
-      }
-    }
-  }
 }
 
 
@@ -301,7 +296,7 @@ void independent_vector
   for(int i=0; i<ny; i++)
     for(int j=0; j<nx; j++)
     { //Discard if NAN
-      if ( std::isfinite(rho[i*nx+j]) && std::isfinite(DI[(i*nx+j)*nz]) )
+      if ( std::isfinite(DIJ[(i*nx+j)*nparams*nz]) && std::isfinite(DI[(i*nx+j)*nz]) )
       sAtb(
         rho[i*nx+j], &(DIJ[(i*nx+j)*nparams*nz]), 
         &(DI[(i*nx+j)*nz]), b, nz, nparams
@@ -378,10 +373,10 @@ void inverse_compositional_algorithm(
     gradient(I1, Ix, Iy, nx, ny, nz);
 
   //Discard boundary pixels
-  for (int index_color = 0; index_color < nz; index_color++) {
-      for (int i = 0; i < ny; i++) {
-          for( int j = 0; j < nx; j++) {
-              if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
+  for (int i = 0; i < ny; i++) {
+      for( int j = 0; j < nx; j++) {
+          if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
+              for (int index_color = 0; index_color < nz; index_color++) {
                   int k = (i * nx + j) * nz + index_color;
                   Ix[k] = NAN;
                   Iy[k] = NAN;
@@ -512,6 +507,19 @@ void robust_inverse_compositional_algorithm(
     gradient_robust(I1, Ix, Iy, nx, ny, nz, ROBUST_GRADIENT());
   else
     gradient(I1, Ix, Iy, nx, ny, nz);
+  
+  //Discard boundary pixels
+  for (int i = 0; i < ny; i++) {
+      for( int j = 0; j < nx; j++) {
+          if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
+              for (int index_color = 0; index_color < nz; index_color++) {
+                  int k = (i * nx + j) * nz + index_color;
+                  Ix[k] = NAN;
+                  Iy[k] = NAN;
+              }
+          }
+      }
+  }
   
   //Evaluate the Jacobian
   if( NORMALIZATION() )

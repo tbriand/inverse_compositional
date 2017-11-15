@@ -27,19 +27,28 @@ SMART_PARAMETER(EDGEPADDING,5)  //control the width of discarded values
   * Neumann boundary condition test
   *
 **/
+// int
+// neumann_bc (int x, int nx, bool & out)
+// {
+//   if (x<0)
+//     {
+//       if(x < -2) out = true;
+//       x = 0;
+//     }
+//   else if (x >= nx)
+//     {
+//       if(x > nx+1) out = true;
+//       x = nx - 1;
+//     }
+//   return x;
+// }
 int
-neumann_bc (int x, int nx, bool & out)
+neumann_bc (int x, int nx)
 {
   if (x<0)
-    {
-      if(x < -2) out = true;
       x = 0;
-    }
   else if (x >= nx)
-    {
-      if(x > nx+1) out = true;
       x = nx - 1;
-    }
   return x;
 }
 
@@ -95,70 +104,60 @@ bicubic_interpolation(
   int nx,       //width of the image
   int ny,       //height of the image
   int nz,       //number of channels of the image
-  int k,        //actual channel
-  bool border_out //if true, put zeros outside the region
+  int k         //actual channel
 )
 {
-  int sx = (uu < 0) ? -1 : 1;
-  int sy = (vv < 0) ? -1 : 1;
+    int sx = (uu < 0) ? -1 : 1;
+    int sy = (vv < 0) ? -1 : 1;
 
-  int x, y, mx, my, dx, dy, ddx, ddy;
-  bool out = false;
+    int x, y, mx, my, dx, dy, ddx, ddy;
 
-  x = neumann_bc ((int) uu, nx, out);
-  y = neumann_bc ((int) vv, ny, out);
-  mx = neumann_bc ((int) uu - sx, nx, out);
-  my = neumann_bc ((int) vv - sx, ny, out);
-  dx = neumann_bc ((int) uu + sx, nx, out);
-  dy = neumann_bc ((int) vv + sy, ny, out);
-  ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
-  ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
+//     x = neumann_bc ((int) uu, nx, out);
+//     y = neumann_bc ((int) vv, ny, out);
+//     mx = neumann_bc ((int) uu - sx, nx, out);
+//     my = neumann_bc ((int) vv - sx, ny, out);
+//     dx = neumann_bc ((int) uu + sx, nx, out);
+//     dy = neumann_bc ((int) vv + sy, ny, out);
+//     ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
+//     ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
+    x = neumann_bc ((int) uu, nx);
+    y = neumann_bc ((int) vv, ny);
+    mx = neumann_bc ((int) uu - sx, nx);
+    my = neumann_bc ((int) vv - sx, ny);
+    dx = neumann_bc ((int) uu + sx, nx);
+    dy = neumann_bc ((int) vv + sy, ny);
+    ddx = neumann_bc ((int) uu + 2 * sx, nx);
+    ddy = neumann_bc ((int) vv + 2 * sy, ny);
 
-  // Discard values if too close to the boundary
-  if ( border_out ) {
-    if ( uu < EDGEPADDING() || uu > nx-1-EDGEPADDING()
-         || vv < EDGEPADDING() || vv > ny-1-EDGEPADDING() )
-      out = true;
-  }
+    //obtain the interpolation points of the image
+    double p11 = input[(mx  + nx * my) * nz + k];
+    double p12 = input[(x   + nx * my) * nz + k];
+    double p13 = input[(dx  + nx * my) * nz + k];
+    double p14 = input[(ddx + nx * my) * nz + k];
 
-  if (out && border_out) {
-    if ( NANIFOUTSIDE() )
-	return NAN;
-    else
-	return 0;
-  }
-  else
-    {
-      //obtain the interpolation points of the image
-      double p11 = input[(mx  + nx * my) * nz + k];
-      double p12 = input[(x   + nx * my) * nz + k];
-      double p13 = input[(dx  + nx * my) * nz + k];
-      double p14 = input[(ddx + nx * my) * nz + k];
+    double p21 = input[(mx  + nx * y) * nz + k];
+    double p22 = input[(x   + nx * y) * nz + k];
+    double p23 = input[(dx  + nx * y) * nz + k];
+    double p24 = input[(ddx + nx * y) * nz + k];
 
-      double p21 = input[(mx  + nx * y) * nz + k];
-      double p22 = input[(x   + nx * y) * nz + k];
-      double p23 = input[(dx  + nx * y) * nz + k];
-      double p24 = input[(ddx + nx * y) * nz + k];
+    double p31 = input[(mx  + nx * dy) * nz + k];
+    double p32 = input[(x   + nx * dy) * nz + k];
+    double p33 = input[(dx  + nx * dy) * nz + k];
+    double p34 = input[(ddx + nx * dy) * nz + k];
 
-      double p31 = input[(mx  + nx * dy) * nz + k];
-      double p32 = input[(x   + nx * dy) * nz + k];
-      double p33 = input[(dx  + nx * dy) * nz + k];
-      double p34 = input[(ddx + nx * dy) * nz + k];
+    double p41 = input[(mx  + nx * ddy) * nz + k];
+    double p42 = input[(x   + nx * ddy) * nz + k];
+    double p43 = input[(dx  + nx * ddy) * nz + k];
+    double p44 = input[(ddx + nx * ddy) * nz + k];
 
-      double p41 = input[(mx  + nx * ddy) * nz + k];
-      double p42 = input[(x   + nx * ddy) * nz + k];
-      double p43 = input[(dx  + nx * ddy) * nz + k];
-      double p44 = input[(ddx + nx * ddy) * nz + k];
+    //create array
+    double pol[4][4] = {
+    {p11, p21, p31, p41}, {p12, p22, p32, p42},
+    {p13, p23, p33, p43}, {p14, p24, p34, p44}
+    };
 
-      //create array
-      double pol[4][4] = {
-        {p11, p21, p31, p41}, {p12, p22, p32, p42},
-        {p13, p23, p33, p43}, {p14, p24, p34, p44}
-      };
-
-      //return interpolation
-      return bicubic_interpolation (pol, (double) uu - x, (double) vv - y);
-    }
+    //return interpolation
+    return bicubic_interpolation (pol, (double) uu - x, (double) vv - y);
 }
 
 
@@ -175,23 +174,35 @@ void bicubic_interpolation(
   int nparams,     //number of parameters of the transform
   int nx,          //width of the image
   int ny,          //height of the image
-  int nz,          //number of channels of the image
-  bool border_out  //if true, put zeros outside the region
+  int nz           //number of channels of the image
 )
 {
+  double out_value = 0;
+  if ( NANIFOUTSIDE() )
+      out_value = NAN;
+  
   for (int i=0; i<ny; i++)
-    for (int j=0; j<nx; j++)
-    {
+    for (int j=0; j<nx; j++) {
       int p=i*nx+j;
       double x, y;
 
       //transform coordinates using the parametric model
       project(j, i, params, x, y, nparams);
 
-      //obtain the bicubic interpolation at position (uu, vv)
-      for(int k=0; k<nz; k++)
-        output[p*nz+k]=bicubic_interpolation(
-          input, x, y, nx, ny, nz, k, border_out
-        );
+      bool out = false;
+      if ( x < EDGEPADDING() || x > nx-1-EDGEPADDING()
+         || y < EDGEPADDING() || y > ny-1-EDGEPADDING() )
+          out = true;
+
+      if ( out ) {
+          for(int k=0; k<nz; k++)
+              output[p*nz+k]=out_value;
+      }
+      else {
+          //obtain the bicubic interpolation at position (uu, vv)
+          for(int k=0; k<nz; k++)
+              output[p*nz+k]=bicubic_interpolation(
+                  input, x, y, nx, ny, nz, k);
+      }
     }
 }
