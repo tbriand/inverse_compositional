@@ -9,10 +9,10 @@
 //July 2017
 //File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
-#include <time.h> 
+#include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <math.h>
 #include <algorithm>
 #include "inverse_compositional_algorithm.h"
@@ -29,14 +29,14 @@
 #define PAR_DEFAULT_FIRST_SCALE 0
 
 #include "smapa.h"
-SMART_PARAMETER(GRAYMETHOD,0)  
+SMART_PARAMETER(GRAYMETHOD,0)
 
 /**
  *
- *  Print a help message 
+ *  Print a help message
  *
  */
-void print_help(char *name) 
+void print_help(char *name)
 {
   printf("\n<Usage>: %s image1 image2 [OPTIONS] \n\n", name);
   printf("This program calculates the transformation between two images.\n");
@@ -50,20 +50,20 @@ void print_help(char *name)
   printf(" -n N    \t Number of scales for the coarse-to-fine scheme\n");
   printf("         \t   Default value %d\n", PAR_DEFAULT_NSCALES);
   printf(" -z F    \t Zoom factor used in the coarse-to-fine scheme \n");
-  printf("         \t   Values must be in the range (0,1)\n"); 
-  printf("         \t   Default value %0.2f\n", 
+  printf("         \t   Values must be in the range (0,1)\n");
+  printf("         \t   Default value %0.2f\n",
                         PAR_DEFAULT_ZFACTOR);
   printf(" -e F    \t Threshold for the convergence criterion \n");
   printf("         \t   Default value %0.4f\n", PAR_DEFAULT_TOL);
   printf(" -t N    \t Transformation type to be computed:\n");
   printf("         \t   2-traslation; 3-Euclidean transform; 4-similarity\n");
-  printf("         \t   6-affinity; 8-homography\n"); 
-  printf("         \t   Default value %d\n", 
+  printf("         \t   6-affinity; 8-homography\n");
+  printf("         \t   Default value %d\n",
                         PAR_DEFAULT_TYPE);
   printf(" -r N    \t Use robust error functions: \n");
-  printf("         \t   0-Non robust (L2 norm); 1-truncated quadratic\n"); 
+  printf("         \t   0-Non robust (L2 norm); 1-truncated quadratic\n");
   printf("         \t   2-German & McLure; 3-Lorentzian 4-Charbonnier \n");
-  printf("         \t   Default value %d\n", 
+  printf("         \t   Default value %d\n",
                         PAR_DEFAULT_ROBUST);
   printf(" -l F    \t Value of the parameter for the robust error function\n");
   printf("         \t   A value <=0 if it is automatically computed\n");
@@ -76,12 +76,12 @@ void print_help(char *name)
 
 /**
  *
- *  Read command line parameters 
+ *  Read command line parameters
  *
  */
 int read_parameters(
-    int    argc, 
-    char   *argv[], 
+    int    argc,
+    char   *argv[],
     char   **image1,
     char   **image2,
     char   *outfile,
@@ -96,22 +96,22 @@ int read_parameters(
 )
 {
   if (argc < 3){
-    print_help(argv[0]); 
+    print_help(argv[0]);
     return 0;
   }
   else{
     int i=1;
     *image1=argv[i++];
-    *image2=argv[i++];      
+    *image2=argv[i++];
 
     //assign default values to the parameters
     strcpy(outfile,PAR_DEFAULT_OUTFILE);
     nscales    =PAR_DEFAULT_NSCALES;
     zfactor    =PAR_DEFAULT_ZFACTOR;
     TOL        =PAR_DEFAULT_TOL;
-    nparams    =PAR_DEFAULT_TYPE; 
-    robust     =PAR_DEFAULT_ROBUST; 
-    lambda     =PAR_DEFAULT_LAMBDA; 
+    nparams    =PAR_DEFAULT_TYPE;
+    robust     =PAR_DEFAULT_ROBUST;
+    lambda     =PAR_DEFAULT_LAMBDA;
     verbose    =PAR_DEFAULT_VERBOSE;
     first_scale=PAR_DEFAULT_FIRST_SCALE;
 
@@ -121,7 +121,7 @@ int read_parameters(
       if(strcmp(argv[i],"-f")==0)
         if(i<argc-1)
           strcpy(outfile,argv[++i]);
-      
+
       if(strcmp(argv[i],"-n")==0)
         if(i<argc-1)
           nscales=atoi(argv[++i]);
@@ -137,7 +137,7 @@ int read_parameters(
       if(strcmp(argv[i],"-t")==0)
         if(i<argc-1)
           nparams=atoi(argv[++i]);
-        
+
       if(strcmp(argv[i],"-r")==0)
         if(i<argc-1)
           robust=atoi(argv[++i]);
@@ -145,22 +145,22 @@ int read_parameters(
       if(strcmp(argv[i],"-l")==0)
         if(i<argc-1)
           lambda=atof(argv[++i]);
-        
+
       if(strcmp(argv[i],"-s")==0)
         if(i<argc-1)
-          first_scale=atoi(argv[++i]);  
+          first_scale=atoi(argv[++i]);
 
       if(strcmp(argv[i],"-v")==0)
         verbose=1;
-      
+
       i++;
     }
-    
+
     //check parameter values
     if(nscales <= 0)           nscales=PAR_DEFAULT_NSCALES;
     if(zfactor<=0||zfactor>=1) zfactor=PAR_DEFAULT_ZFACTOR;
     if(TOL<0)                  TOL    =PAR_DEFAULT_TOL;
-    if(nparams!=2 && nparams!=3 && nparams!=4 && 
+    if(nparams!=2 && nparams!=3 && nparams!=4 &&
      nparams!=6 && nparams!=8) nparams=PAR_DEFAULT_TYPE;
     if(robust<0||robust>4)     robust =PAR_DEFAULT_ROBUST;
     if(lambda<0)               lambda =PAR_DEFAULT_LAMBDA;
@@ -172,13 +172,13 @@ int read_parameters(
 /**
   *
   *  Function to convert an rgb image to grayscale levels
-  * 
+  *
 **/
 void rgb2gray(
   double *rgb,  //input color image
   double *gray, //output grayscale image
   int nx,       //number of pixels
-  int ny, 
+  int ny,
   int nz
 )
 {
@@ -186,12 +186,11 @@ void rgb2gray(
   if( nz==3 )
     //#pragma omp parallel for
     for(int i=0;i<size;i++)
-      gray[i]=(0.2989*rgb[i*nz]+0.5870*rgb[i*nz+1]+0.1140*rgb[i*nz+2]);
+      gray[i]=0.3333333333333*(rgb[i*nz]+rgb[i*nz+1]+rgb[i*nz+2]);
   else
     //#pragma omp parallel for
     for(int i=0;i<size;i++)
       gray[i]=rgb[i];
-  
 }
 
 /**
@@ -205,10 +204,10 @@ void rgb2gray(
  *   -nscales     number of scales for the pyramidal approach
  *   -zoom_factor reduction factor for creating the scales
  *   -TOL         stopping criterion threshold for the iterative process
- *   -robust      type of the robust error function 
+ *   -robust      type of the robust error function
  *   -lambda      parameter of the robust error function
  *   -type        type of the parametric model (the number of parameters):
- *                Translation(2), Euclidean(3), Similarity(4), Affinity(6), 
+ *                Translation(2), Euclidean(3), Similarity(4), Affinity(6),
  *                Homography(8)
  *   -first_scale first scale used in the pyramid
  *   -verbose     switch on/off messages
@@ -223,10 +222,10 @@ int main (int argc, char *argv[])
 
   //read the parameters from the console
   int result=read_parameters(
-        argc, argv, &image1, &image2, outfile, nscales, 
+        argc, argv, &image1, &image2, outfile, nscales,
         zfactor, TOL, nparams, robust, lambda, verbose, first_scale
       );
-  
+
   if(result)
   {
     int nx, ny, nz, nx1, ny1, nz1;
@@ -240,7 +239,7 @@ int main (int argc, char *argv[])
     // if the images are correct, compute the optical flow
     if (correct1 && correct2 && nx == nx1 && ny == ny1 && nz == nz1)
     {
-      if(verbose) 
+      if(verbose)
         printf(
           "\nParameters: scales=%d, zoom=%f, TOL=%f, transform type=%d, "
           "robust function=%d, lambda=%f, output file=%s\n",
@@ -253,60 +252,59 @@ int main (int argc, char *argv[])
 
       //allocate memory for the parametric model
       double *p=new double[nparams];
-      
+
       if( GRAYMETHOD() && nz==3 ) {
         //convert images to grayscale
         double *I1g=new double[nx*ny];
         double *I2g=new double[nx*ny];
-      
+
         rgb2gray(I1, I1g, nx, ny, nz);
         rgb2gray(I2, I2g, nx, ny, nz);
-        
+
         //free memory
         free (I1);
         free (I2);
-        
+
         //compute the optic flow
         const clock_t begin = clock();
         pyramidal_inverse_compositional_algorithm(
-           I1g, I2g, p, nparams, nx, ny, 1, 
+           I1g, I2g, p, nparams, nx, ny, 1,
         nscales, zfactor, TOL, robust, lambda, verbose, first_scale
         );
-      
-        if(verbose) 
+
+        if(verbose)
            printf("Time=%f\n", double(clock()-begin)/CLOCKS_PER_SEC);
-        
+
         //free memory
-        delete[]I1g;          
+        delete[]I1g;
         delete[]I2g;
       }
       else {
         //compute the optic flow
         const clock_t begin = clock();
         pyramidal_inverse_compositional_algorithm(
-           I1, I2, p, nparams, nx, ny, nz, 
+           I1, I2, p, nparams, nx, ny, nz,
         nscales, zfactor, TOL, robust, lambda, verbose, first_scale
         );
-      
-        if(verbose) 
+
+        if(verbose)
            printf("Time=%f\n", double(clock()-begin)/CLOCKS_PER_SEC);
         //free memory
         free (I1);
-        free (I2);  
+        free (I2);
       }
-      
+
       //save the parametric model to disk
       save(outfile, p, nparams);
 
       //free memory
       delete[]p;
     }
-    else 
+    else
     {
       printf("Cannot read the images or their sizes are not the same\n");
       exit(EXIT_FAILURE);
     }
-      
   }
   exit(EXIT_SUCCESS);
 }

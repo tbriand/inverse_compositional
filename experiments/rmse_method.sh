@@ -1,13 +1,14 @@
 #!/bin/bash
 
-if [ "$#" -lt "3" ]; then
-    echo "usage:\n\t$0 noise n L"
+if [ "$#" -lt "4" ]; then
+    echo "usage:\n\t$0 img noise n L"
     exit 1
 fi
 
-noise=$1
-NUMBER=$2
-L=$3
+in=$1
+noise=$2
+NUMBER=$3
+L=$4
 
 if [ -z "$NTHREADS" ]; then
     NTHREADS=1
@@ -45,7 +46,7 @@ mkdir $dir
 cd $dir
 
 # create burst
-in=~/images/homography2.png
+#in=~/images/homography2.png
 #in=~/images/lena_nb.png
 
 interp=bicubic

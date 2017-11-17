@@ -13,88 +13,91 @@ time_sift=time_sift.txt
 SAVE=1          #saving with good precision is necessary
 
 # sift table
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-    echo "& $\\sigma = 0$ & $\\sigma = 3$ & $\\sigma = 5$ & $\\sigma = 10$ & $\\sigma = 20$ & $\\sigma = 30$ & $\\sigma = 50$  \\\\"
-    echo "\\hline"
-
-    # RMSE
-    line2echo="RMSE"
-    for noise in 0 3 5 10 20 30 50; do
-        dir=noise$noise
-        cd $dir
-        line2echo="$line2echo & `mean_and_std $rmse_sift 0`"
-        cd ..
-    done
-    line2echo="$line2echo \\\\"
-    echo "$line2echo"
-
-    # TIME
-    line2echo="Time"
-    for noise in 0 3 5 10 20 30 50; do
-        dir=noise$noise
-        cd $dir
-        line2echo="$line2echo & `cat $time_sift`"
-        cd ..
-    done
-    echo "$line2echo"
-    echo "\\end{tabular}"
-    echo "\\caption{SIFT + RANSAC estimation}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-
-# ICA COLOR
-#     echo ""
-#     FIRST_SCALE=0
-#     ROBUST_GRADIENT=3
-#     EDGEPADDING=5
-#     NANIFOUTSIDE=1
 #     echo "\\begin{table}"
 #     echo "\\begin{center}"
-#     echo "\\begin{tabular}{l|l|l|l|l|l}"
-#     echo "\\multicolumn{2}{l}{} &\\multicolumn{2}{|c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
+#     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
+#     echo "& $\\sigma = 0$ & $\\sigma = 3$ & $\\sigma = 5$ & $\\sigma = 10$ & $\\sigma = 20$ & $\\sigma = 30$ & $\\sigma = 50$  \\\\"
 #     echo "\\hline"
-#     echo "\\multicolumn{2}{l|}{} & & Gray & & Gray\\\\"
+# 
+#     # RMSE
+#     line2echo="RMSE"
 #     for noise in 0 3 5 10 20 30 50; do
-#             dir=noise$noise
-#             cd $dir
-#             echo "\\hline"
-# 
-#             #RMSE
-#             line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
-#             for ROBUST in 0 3; do
-#                     for GRAYMETHOD in 0 1; do
-#                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-#                         # field comparison
-#                         rmse_ica=rmse_ica_${basefile}.txt
-#                         line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-#                     done
-#             done
-#             line2echo="$line2echo \\\\"
-#             echo "$line2echo"
-# 
-#             #TIME
-#             line2echo=" & Time"
-#             for ROBUST in 0 1 2 3 4; do
-#                     for GRAYMETHOD in 0 1; do
-#                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-#                         # field comparison
-#                         time_ica=time_ica_${basefile}.txt
-#                         line2echo="$line2echo & `cat $time_ica`"
-#                     done
-#             done
-#             if [ ! "$noise" -eq "50" ]; then
-#                 line2echo="$line2echo \\\\"
-#             fi
-#             echo "$line2echo"
-# 
-#             cd ..
+#         dir=noise$noise
+#         cd $dir
+#         line2echo="$line2echo & `mean_and_std $rmse_sift 0`"
+#         cd ..
 #     done
+#     line2echo="$line2echo \\\\"
+#     echo "$line2echo"
+# 
+#     # TIME
+#     line2echo="Time"
+#     for noise in 0 3 5 10 20 30 50; do
+#         dir=noise$noise
+#         cd $dir
+#         line2echo="$line2echo & `cat $time_sift`"
+#         cd ..
+#     done
+#     echo "$line2echo"
 #     echo "\\end{tabular}"
-#     echo "\\caption{Influence of the color handling}"
+#     echo "\\caption{SIFT + RANSAC estimation}"
 #     echo "\\end{center}"
 #     echo "\\end{table}"
+
+# ICA COLOR
+c=`imprintf %c burst_1.tiff`
+if [ "$c" -eq "3" ]; then
+    echo ""
+    FIRST_SCALE=0
+    ROBUST_GRADIENT=3
+    EDGEPADDING=5
+    NANIFOUTSIDE=1
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\begin{tabular}{l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l}{} &\\multicolumn{2}{|c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
+    echo "\\hline"
+    echo "\\multicolumn{2}{l|}{} & & Gray & & Gray\\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            for ROBUST in 0 3; do
+                    for GRAYMETHOD in 0 1; do
+                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                        # field comparison
+                        rmse_ica=rmse_ica_${basefile}.txt
+                        line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+                    done
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for ROBUST in 0 3; do
+                    for GRAYMETHOD in 0 1; do
+                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                        # field comparison
+                        time_ica=time_ica_${basefile}.txt
+                        line2echo="$line2echo & `cat $time_ica`"
+                    done
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "\\caption{Influence of the color handling}"
+    echo "\\end{center}"
+    echo "\\end{table}"
+fi
 
 # ICA DBP
     echo ""
@@ -141,7 +144,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         line2echo="$line2echo & `cat $time_ica`"
-                    
+
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
@@ -206,7 +209,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         line2echo="$line2echo & `cat $time_ica`"
-                    
+
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
@@ -223,10 +226,10 @@ SAVE=1          #saving with good precision is necessary
             cd ..
     done
     echo "\\end{tabular}"
-    echo "\\caption{Influence of discarding boundary pixels (with the Farid 5x5 gradient estimator)}"
+    echo "\\caption{Influence of discarding boundary pixels (using the Farid 5x5 gradient estimator)}"
     echo "\\end{center}"
     echo "\\end{table}"
-    
+
 # ICA GRADIENT
     echo ""
     ROBUST=0
@@ -237,12 +240,12 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
+    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & RMSE"
             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
@@ -256,7 +259,7 @@ SAVE=1          #saving with good precision is necessary
 
             #TIME
             line2echo=" & Time"
-          t a  for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
@@ -283,12 +286,12 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
+    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
             echo "\\hline"
-            
+
             #RMSE
             line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & RMSE"
             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
@@ -319,8 +322,8 @@ SAVE=1          #saving with good precision is necessary
     echo "\\caption{Influence of the gradient estimator (using the Lorentzian error function and discarding boundary pixels)}"
     echo "\\end{center}"
     echo "\\end{table}"
-    
-# ICA FIRST SCALE    
+
+# ICA FIRST SCALE
     echo ""
     ROBUST=0
     ROBUST_GRADIENT=3
@@ -330,7 +333,7 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
+    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
@@ -376,7 +379,7 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
+    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
@@ -411,9 +414,9 @@ SAVE=1          #saving with good precision is necessary
     echo "\\end{tabular}"
     echo "\\caption{Influence of the first scale (using the Lorentzian error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
     echo "\\end{center}"
-    echo "\\end{table}"    
-    
-# COMPARISON ALL METHODS    
+    echo "\\end{table}"
+
+# COMPARISON ALL METHODS
     echo ""
     GRAYMETHOD=0
     FIRST_SCALE=0
@@ -423,7 +426,7 @@ SAVE=1          #saving with good precision is necessary
     echo "\\begin{table}"
     echo "\\begin{center}"
     echo "\\begin{tabular}{l|l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l|}{} &  & \\multicolumn{2}{c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
+    echo "\\multicolumn{3}{l|}{} & \\multicolumn{2}{c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
     echo "\\hline"
     echo "\\multicolumn{2}{l|}{} & SIFT + RANSAC & IC & IC optimized & IC & IC optimized \\\\"
     for noise in 0 3 5 10 20 30 50; do
@@ -444,7 +447,7 @@ SAVE=1          #saving with good precision is necessary
                 #ic optimized
                 line2echo="$line2echo & ?"
             done
-            
+
             line2echo="$line2echo \\\\"
             echo "$line2echo"
 
@@ -461,7 +464,7 @@ SAVE=1          #saving with good precision is necessary
                 #ic optimized
                 line2echo="$line2echo & ?"
             done
-            
+
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
             fi
