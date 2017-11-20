@@ -66,6 +66,7 @@ if [ "$c" -eq "3" ]; then
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the color handling}"
+    echo "\\label{fig::ic_color_handling}"
     echo "\\end{center}"
     echo "\\end{table}"
 fi
@@ -80,7 +81,7 @@ fi
     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
     echo "\\multicolumn{2}{l}{} &\\multicolumn{3}{|c|}{L2} & \\multicolumn{3}{c}{Lorentzian} \\\\"
     echo "\\hline"
-    echo "\\multicolumn{2}{l|}{} & & DBP $ d=0 $ & DBP $ d=5 $ & & DBP $ d=0 $ & DBP $ d=5 $\\\\"
+    echo "\\multicolumn{2}{l|}{} & & DBP $ \delta=0 $ & DBP $ \delta=5 $ & & DBP $ \delta=0 $ & DBP $ \delta=5 $\\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
@@ -134,6 +135,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of discarding boundary pixels (using the central differences gradient estimator)}"
+    echo "\\label{fig::ic_dbp_central_differences}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -146,7 +148,7 @@ fi
     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
     echo "\\multicolumn{2}{l}{} &\\multicolumn{3}{|c|}{L2} & \\multicolumn{3}{c}{Lorentzian} \\\\"
     echo "\\hline"
-    echo "\\multicolumn{2}{l|}{} & & DBP $ d=0 $ & DBP $ d=5 $ & & DBP $ d=0 $ & DBP $ d=5 $\\\\"
+    echo "\\multicolumn{2}{l|}{} & & DBP $ \delta=0 $ & DBP $ \delta=5 $ & & DBP $ \delta=0 $ & DBP $ \delta=5 $\\\\"
     for noise in 0 3 5 10 20 30 50; do
             dir=noise$noise
             cd $dir
@@ -201,6 +203,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of discarding boundary pixels (using the Farid 5x5 gradient estimator)}"
+    echo "\\label{fig::ic_dbp_farid}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -249,6 +252,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the gradient estimator (using the L2 error function and discarding boundary pixels)}"
+    echo "\\label{fig::ic_gradient_l2}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -296,6 +300,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the gradient estimator (using the Lorentzian error function and discarding boundary pixels)}"
+    echo "\\label{fig::ic_gradient_lorentzian}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -344,6 +349,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the first scale (using the L2 error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
+    echo "\\label{fig::ic_first_scale_l2}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -391,6 +397,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Influence of the first scale (using the Lorentzian error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
+    echo "\\label{fig::ic_first_scale_lorentzian}"
     echo "\\end{center}"
     echo "\\end{table}"
 
@@ -454,6 +461,7 @@ fi
     done
     echo "\\end{tabular}"
     echo "\\caption{Comparison of the methods. The IC algorithm corresponds to the original algorithm but with the discarding of outside pixels ($ d = 0 $). The optimized IC algorithm uses the Farid 5x5 kernel estimator and discards boundary pixels. The first scale used is precised in parenthesis after the RMSE value.}"
+    echo "\\label{fig::ic_all_comparisons}"
     echo "\\end{center}"
     echo "\\end{table}"
 
