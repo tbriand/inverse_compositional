@@ -115,7 +115,8 @@ fi
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
-                        line2echo="$line2echo & `cat $time_ica`"
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
 
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
@@ -460,7 +461,7 @@ fi
             cd ..
     done
     echo "\\end{tabular}"
-    echo "\\caption{Comparison of the methods. The IC algorithm corresponds to the original algorithm but with the discarding of outside pixels ($ d = 0 $). The optimized IC algorithm uses the Farid 5x5 kernel estimator and discards boundary pixels. The first scale used is precised in parenthesis after the RMSE value.}"
+    echo "\\caption{Comparison of the methods. The IC algorithm corresponds to the original algorithm but with the discarding of outside pixels ($ \delta = 0 $). The optimized IC algorithm uses the Farid 5x5 kernel estimator and discards boundary pixels. The first scale used is precised in parenthesis after the RMSE value.}"
     echo "\\label{fig::ic_all_comparisons}"
     echo "\\end{center}"
     echo "\\end{table}"
