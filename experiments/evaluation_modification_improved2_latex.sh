@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export LC_NUMERIC=C
+
 # change directory
 dir=evaluation_modification
 cd $dir
@@ -11,38 +13,6 @@ time_sift=time_sift.txt
 
 # ICA fixed parameters
 SAVE=1          #saving with good precision is necessary
-
-# sift table
-#     echo "\\begin{table}"
-#     echo "\\begin{center}"
-#     echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-#     echo "& $\\sigma = 0$ & $\\sigma = 3$ & $\\sigma = 5$ & $\\sigma = 10$ & $\\sigma = 20$ & $\\sigma = 30$ & $\\sigma = 50$  \\\\"
-#     echo "\\hline"
-# 
-#     # RMSE
-#     line2echo="RMSE"
-#     for noise in 0 3 5 10 20 30 50; do
-#         dir=noise$noise
-#         cd $dir
-#         line2echo="$line2echo & `mean_and_std $rmse_sift 0`"
-#         cd ..
-#     done
-#     line2echo="$line2echo \\\\"
-#     echo "$line2echo"
-# 
-#     # TIME
-#     line2echo="Time"
-#     for noise in 0 3 5 10 20 30 50; do
-#         dir=noise$noise
-#         cd $dir
-#         line2echo="$line2echo & `cat $time_sift`"
-#         cd ..
-#     done
-#     echo "$line2echo"
-#     echo "\\end{tabular}"
-#     echo "\\caption{SIFT + RANSAC estimation}"
-#     echo "\\end{center}"
-#     echo "\\end{table}"
 
 # ICA COLOR
 c=`imprintf %c burst_1.tiff`
@@ -83,7 +53,8 @@ if [ "$c" -eq "3" ]; then
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
-                        line2echo="$line2echo & `cat $time_ica`"
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -150,7 +121,8 @@ fi
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
-                        line2echo="$line2echo & `cat $time_ica`"
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -208,14 +180,16 @@ fi
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
-                        line2echo="$line2echo & `cat $time_ica`"
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
 
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
-                        line2echo="$line2echo & `cat $time_ica`"
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -263,7 +237,8 @@ fi
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
-                line2echo="$line2echo & `cat $time_ica`"
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%0.2f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -309,7 +284,8 @@ fi
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
-                line2echo="$line2echo & `cat $time_ica`"
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%0.2f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -356,7 +332,8 @@ fi
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
-                line2echo="$line2echo & `cat $time_ica`"
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%0.2f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -402,7 +379,8 @@ fi
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
-                line2echo="$line2echo & `cat $time_ica`"
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%0.2f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -454,13 +432,15 @@ fi
             #TIME
             line2echo=" & Time"
             #sift
-            line2echo="$line2echo & `cat $time_sift`"
+            vartime=`cat $time_sift`
+            line2echo="$line2echo & `printf "%0.2f" $vartime`"
 
             for ROBUST in 0 3; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 #ic
                 time_ica=time_ica_${basefile}.txt
-                line2echo="$line2echo & `cat $time_ica`"
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%0.2f" $vartime`"
                 #ic optimized
                 line2echo="$line2echo & ?"
             done
