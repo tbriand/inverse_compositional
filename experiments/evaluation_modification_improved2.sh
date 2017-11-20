@@ -41,6 +41,8 @@ max_sift=max_sift.txt
 time_sift=time_sift.txt
 ref_number=1 # the reference image is assumed to be the first image
 
+TIMEFORMAT="%U"
+
 # ICA parameters
 NORMALIZATION=0
 SAVE=1
@@ -74,11 +76,11 @@ for noise in 0 3 5 10 20 30 50; do
 
     # SIFT + RANSAC estimation
         echo "SIFT + RANSAC estimation"
-        start=`date +%s.%N`
-        NTHREADS=$NTHREADS burst_registration_iteration.sh $INPAT_NOISY $regpat $ref_number $NUMBER $ref_number $method $boundary $sr 0 > /dev/null
-        end=`date +%s.%N`
-        runtime=$(echo "$end - $start" | bc)
-        echo "$runtime" > $time_sift
+        #start=`date +%s.%N`
+        { time NTHREADS=$NTHREADS burst_registration_iteration.sh $INPAT_NOISY $regpat $ref_number $NUMBER $ref_number $method $boundary $sr 0 &> /dev/null; } 2> $time_sift 
+        #end=`date +%s.%N`
+        #runtime=$(echo "$end - $start" | bc)
+        #echo "$runtime" > $time_sift
 
         # field comparison
         for i in `seq 2 $NUMBER`; do
@@ -136,16 +138,16 @@ for noise in 0 3 5 10 20 30 50; do
                                     max_ica=max_ica_${basefile}.txt
 
                                     # ICA estimation
-                                    start=`date +%s.%N`
-                                    for i in `seq 2 $NUMBER`; do
+                                    #start=`date +%s.%N`
+                                    { time for i in `seq 2 $NUMBER`; do
                                         INi=`printf $INPAT_NOISY $i`
                                         REGi=`printf $regpat_ica $i`
                                         cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                                         echo "$cmd"
-                                    done | parallel -j $NTHREADS
-                                    end=`date +%s.%N`
-                                    runtime=$(echo "$end - $start" | bc) 
-                                    echo "$runtime" > $time_ica
+                                    done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
+                                    #end=`date +%s.%N`
+                                    #runtime=$(echo "$end - $start" | bc) 
+                                    #echo "$runtime" > $time_ica
 
                                     # field comparison
                                     for i in `seq 2 $NUMBER`; do
@@ -205,16 +207,16 @@ for noise in 0 3 5 10 20 30 50; do
                                 max_ica=max_ica_${basefile}.txt
 
                                 # ICA estimation
-                                start=`date +%s.%N`
-                                for i in `seq 2 $NUMBER`; do
+                                #start=`date +%s.%N`
+                                { time for i in `seq 2 $NUMBER`; do
                                     INi=`printf $INPAT_NOISY $i`
                                     REGi=`printf $regpat_ica $i`
                                     cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                                     echo "$cmd"
-                                done | parallel -j $NTHREADS
-                                end=`date +%s.%N`
-                                runtime=$(echo "$end - $start" | bc) 
-                                echo "$runtime" > $time_ica
+                                done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
+                                #end=`date +%s.%N`
+                                #runtime=$(echo "$end - $start" | bc) 
+                                #echo "$runtime" > $time_ica
 
                                 # field comparison
                                 for i in `seq 2 $NUMBER`; do

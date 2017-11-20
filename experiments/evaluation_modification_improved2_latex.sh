@@ -14,63 +14,6 @@ time_sift=time_sift.txt
 # ICA fixed parameters
 SAVE=1          #saving with good precision is necessary
 
-# ICA COLOR
-c=`imprintf %c burst_1.tiff`
-if [ "$c" -eq "3" ]; then
-    echo ""
-    FIRST_SCALE=0
-    ROBUST_GRADIENT=3
-    EDGEPADDING=5
-    NANIFOUTSIDE=1
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l}{} &\\multicolumn{2}{|c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
-    echo "\\hline"
-    echo "\\multicolumn{2}{l|}{} & & Gray & & Gray\\\\"
-    for noise in 0 3 5 10 20 30 50; do
-            dir=noise$noise
-            cd $dir
-            echo "\\hline"
-
-            #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
-            for ROBUST in 0 3; do
-                    for GRAYMETHOD in 0 1; do
-                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                        # field comparison
-                        rmse_ica=rmse_ica_${basefile}.txt
-                        line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-                    done
-            done
-            line2echo="$line2echo \\\\"
-            echo "$line2echo"
-
-            #TIME
-            line2echo=" & Time"
-            for ROBUST in 0 3; do
-                    for GRAYMETHOD in 0 1; do
-                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                        # field comparison
-                        time_ica=time_ica_${basefile}.txt
-                        vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
-                    done
-            done
-            if [ ! "$noise" -eq "50" ]; then
-                line2echo="$line2echo \\\\"
-            fi
-            echo "$line2echo"
-
-            cd ..
-    done
-    echo "\\end{tabular}"
-    echo "\\caption{Influence of the color handling}"
-    echo "\\label{fig::ic_color_handling}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-fi
-
 # ICA DBP
     echo ""
     FIRST_SCALE=0
@@ -402,6 +345,63 @@ fi
     echo "\\end{center}"
     echo "\\end{table}"
 
+# ICA COLOR
+c=`imprintf %c burst_1.tiff`
+if [ "$c" -eq "3" ]; then
+    echo ""
+    FIRST_SCALE=0
+    ROBUST_GRADIENT=3
+    EDGEPADDING=5
+    NANIFOUTSIDE=1
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\begin{tabular}{l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l}{} &\\multicolumn{2}{|c|}{L2} & \\multicolumn{2}{c}{Lorentzian} \\\\"
+    echo "\\hline"
+    echo "\\multicolumn{2}{l|}{} & & Gray & & Gray\\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            for ROBUST in 0 3; do
+                    for GRAYMETHOD in 0 1; do
+                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                        # field comparison
+                        rmse_ica=rmse_ica_${basefile}.txt
+                        line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+                    done
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for ROBUST in 0 3; do
+                    for GRAYMETHOD in 0 1; do
+                        basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                        # field comparison
+                        time_ica=time_ica_${basefile}.txt
+                        vartime=`cat $time_ica`
+                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                    done
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "\\caption{Influence of the color handling}"
+    echo "\\label{fig::ic_color_handling}"
+    echo "\\end{center}"
+    echo "\\end{table}"
+fi    
+    
 # COMPARISON ALL METHODS
     echo ""
     GRAYMETHOD=0
