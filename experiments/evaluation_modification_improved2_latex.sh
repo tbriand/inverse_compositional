@@ -59,7 +59,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                        line2echo="$line2echo & `printf "%5.0f" $vartime`"
 
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
@@ -67,7 +67,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                        line2echo="$line2echo & `printf "%5.0f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -85,7 +85,7 @@ SAVE=1          #saving with good precision is necessary
 
     echo ""
     FIRST_SCALE=0
-    ROBUST_GRADIENT=5
+    ROBUST_GRADIENT=3
     GRAYMETHOD=0
     echo "\\begin{table}"
     echo "\\begin{center}"
@@ -127,7 +127,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                        line2echo="$line2echo & `printf "%5.0f" $vartime`"
 
                     NANIFOUTSIDE=1
                     for EDGEPADDING in 0 5; do
@@ -135,7 +135,7 @@ SAVE=1          #saving with good precision is necessary
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                        line2echo="$line2echo & `printf "%5.0f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -185,7 +185,7 @@ SAVE=1          #saving with good precision is necessary
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
                 vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -233,7 +233,7 @@ SAVE=1          #saving with good precision is necessary
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
                 vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -282,7 +282,7 @@ SAVE=1          #saving with good precision is necessary
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
                 vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -330,7 +330,7 @@ SAVE=1          #saving with good precision is necessary
                 # field comparison
                 time_ica=time_ica_${basefile}.txt
                 vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
             done
             if [ ! "$noise" -eq "50" ]; then
                 line2echo="$line2echo \\\\"
@@ -385,7 +385,7 @@ if [ "$c" -eq "3" ]; then
                         # field comparison
                         time_ica=time_ica_${basefile}.txt
                         vartime=`cat $time_ica`
-                        line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                        line2echo="$line2echo & `printf "%5.0f" $vartime`"
                     done
             done
             if [ ! "$noise" -eq "50" ]; then
@@ -441,14 +441,14 @@ fi
             line2echo=" & Time"
             #sift
             vartime=`cat $time_sift`
-            line2echo="$line2echo & `printf "%0.2f" $vartime`"
+            line2echo="$line2echo & `printf "%5.0f" $vartime`"
 
             for ROBUST in 0 3; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 #ic
                 time_ica=time_ica_${basefile}.txt
                 vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%0.2f" $vartime`"
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
                 #ic optimized
                 line2echo="$line2echo & ?"
             done
