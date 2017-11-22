@@ -37,7 +37,8 @@
 #include "zoom.h"
 
 #include "smapa.h"
-SMART_PARAMETER(EDGEPADDING,5)     //to discard boundary pixels (valued as NAN)
+SMART_PARAMETER(NANIFOUTSIDE,1)    //to discard boundary pixels (valued as NAN)
+SMART_PARAMETER(EDGEPADDING,5)     //boundary pixels
 SMART_PARAMETER(NORMALIZATION,0)   //to normalize the position
 SMART_PARAMETER(ROBUST_GRADIENT,3) //choice of the robust gradient
 
@@ -373,16 +374,19 @@ void inverse_compositional_algorithm(
     gradient(I1, Ix, Iy, nx, ny, nz);
 
   //Discard boundary pixels
-  for (int i = 0; i < ny; i++) {
-      for( int j = 0; j < nx; j++) {
-          if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
-              for (int index_color = 0; index_color < nz; index_color++) {
-                  int k = (i * nx + j) * nz + index_color;
-                  Ix[k] = NAN;
-                  Iy[k] = NAN;
-              }
-          }
-      }
+  int delta = EDGEPADDING();
+  if ( NANIFOUTSIDE() && delta) {
+    for (int i = 0; i < ny; i++) {
+        for( int j = 0; j < nx; j++) {
+            if ( i < delta || i > ny-1-delta || j < delta || j > nx - 1 - delta) {
+                for (int index_color = 0; index_color < nz; index_color++) {
+                    int k = (i * nx + j) * nz + index_color;
+                    Ix[k] = NAN;
+                    Iy[k] = NAN;
+                }
+            }
+        }
+    }
   }
 
   //Evaluate the Jacobian
@@ -509,18 +513,21 @@ void robust_inverse_compositional_algorithm(
     gradient(I1, Ix, Iy, nx, ny, nz);
 
   //Discard boundary pixels
-  for (int i = 0; i < ny; i++) {
-      for( int j = 0; j < nx; j++) {
-          if ( i < EDGEPADDING() || i > ny-1-EDGEPADDING() || j < EDGEPADDING() || j > nx - 1 - EDGEPADDING()) {
-              for (int index_color = 0; index_color < nz; index_color++) {
-                  int k = (i * nx + j) * nz + index_color;
-                  Ix[k] = NAN;
-                  Iy[k] = NAN;
-              }
-          }
-      }
+  int delta = EDGEPADDING();
+  if ( NANIFOUTSIDE() && delta) {
+    for (int i = 0; i < ny; i++) {
+        for( int j = 0; j < nx; j++) {
+            if ( i < delta || i > ny-1-delta || j < delta || j > nx - 1 - delta) {
+                for (int index_color = 0; index_color < nz; index_color++) {
+                    int k = (i * nx + j) * nz + index_color;
+                    Ix[k] = NAN;
+                    Iy[k] = NAN;
+                }
+            }
+        }
+    }
   }
-
+  
   //Evaluate the Jacobian
   if( NORMALIZATION() )
     jacobian_normalized(J, nparams, nx, ny, normalization_factor);

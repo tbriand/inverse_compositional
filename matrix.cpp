@@ -27,19 +27,24 @@ void Axb(double *A, double *b, double *p, int n)
 //p should be initialized to zero outside
 void Atb(double *A, double *b, double *p, int n, int m)
 {
-  for(int i=0; i<m; i++)
-    for(int j=0; j<n; j++)
-      p[i]+=A[j*m+i]*b[j];
+  for(int i=0; i<m; i++) {
+    double sum = 0;
+    for(int j=0; j<n; j++) 
+      sum +=A[j*m+i]*b[j];
+    p[i] += sum;
+  }
 }
 
 //Multiplication of the transpose of a matrix, a vector and a scalar
 //p should be initialized to zero outside
 void sAtb(double s, double *A, double *b, double *p, int n, int m)
 {
-  //if ( isfinite(s) ) 
-  for(int i=0; i<m; i++)
+  for(int i=0; i<m; i++) {
+    double sum = 0;  
     for(int j=0; j<n; j++)
-      p[i]+=s*A[j*m+i]*b[j];
+      sum += A[j*m+i]*b[j];
+    p[i] += s*sum;
+  }
 }
 
 //Multiplication of the transpose of a matrix and itself
@@ -47,19 +52,29 @@ void sAtb(double s, double *A, double *b, double *p, int n, int m)
 void AtA(double *A, double *B, int n, int m)
 {
   for(int i=0; i<m; i++)
-    for(int j=0; j<m; j++)
+    for(int j=0; j<m; j++) {
+      double sum = 0;
       for(int k=0; k<n; k++)
-        B[i*m+j]+=A[k*m+i]*A[k*m+j];
+        sum += A[k*m+i]*A[k*m+j];
+      B[i*m+j] += sum;
+    }
 }
 
 //Multiplication of the transpose of a matrix and itself with a scalar
 //B should be initialized to zero outside
 void sAtA(double s, double *A, double *B, int n, int m)
 {
+//   for(int i=0; i<m; i++)
+//     for(int j=0; j<m; j++)
+//       for(int k=0; k<n; k++)
+//         B[i*m+j]+=s*A[k*m+i]*A[k*m+j];
   for(int i=0; i<m; i++)
-    for(int j=0; j<m; j++)
+    for(int j=0; j<m; j++) {
+      double sum = 0;
       for(int k=0; k<n; k++)
-        B[i*m+j]+=s*A[k*m+i]*A[k*m+j];
+        sum += A[k*m+i]*A[k*m+j];
+      B[i*m+j] += s*sum;
+    }
 }
 
 

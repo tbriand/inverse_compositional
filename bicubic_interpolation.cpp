@@ -180,6 +180,7 @@ void bicubic_interpolation(
   double out_value = 0;
   if ( NANIFOUTSIDE() )
       out_value = NAN;
+  int delta = EDGEPADDING();
   
   for (int i=0; i<ny; i++)
     for (int j=0; j<nx; j++) {
@@ -190,8 +191,8 @@ void bicubic_interpolation(
       project(j, i, params, x, y, nparams);
 
       bool out = false;
-      if ( x < EDGEPADDING() || x > nx-1-EDGEPADDING()
-         || y < EDGEPADDING() || y > ny-1-EDGEPADDING() )
+      if ( x < delta || x > nx-1-delta
+         || y < delta || y > ny-1-delta )
           out = true;
 
       if ( out ) {
