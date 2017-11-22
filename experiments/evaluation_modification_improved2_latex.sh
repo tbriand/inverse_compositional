@@ -31,7 +31,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             for ROBUST in 0 3; do
                     NANIFOUTSIDE=0
                     EDGEPADDING=0
@@ -99,7 +99,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             for ROBUST in 0 3; do
                     NANIFOUTSIDE=0
                     EDGEPADDING=0
@@ -168,7 +168,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
@@ -216,7 +216,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
@@ -265,7 +265,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             for FIRST_SCALE in 0 1 2 3; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
@@ -313,7 +313,7 @@ SAVE=1          #saving with good precision is necessary
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             for FIRST_SCALE in 0 1 2 3; do
                 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
                 # field comparison
@@ -365,7 +365,7 @@ if [ "$c" -eq "3" ]; then
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             for ROBUST in 0 3; do
                     for GRAYMETHOD in 0 1; do
                         basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
@@ -421,7 +421,7 @@ fi
             echo "\\hline"
 
             #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & RMSE"
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
             #sift
             line2echo="$line2echo & `mean_and_std $rmse_sift 0`"
 
@@ -461,7 +461,7 @@ fi
             cd ..
     done
     echo "\\end{tabular}"
-    echo "\\caption{Comparison of the methods. The IC algorithm corresponds to the original algorithm but with the discarding of outside pixels ($ \delta = 0 $). The optimized IC algorithm uses the Farid 5x5 kernel estimator and discards boundary pixels. The first scale used is precised in parenthesis after the RMSE value.}"
+    echo "\\caption{Comparison of the methods. The IC algorithm corresponds to the original algorithm but with the discarding of outside pixels ($ \delta = 0 $). The optimized IC algorithm uses the Farid 5x5 kernel estimator and discards boundary pixels.}"
     echo "\\label{fig::ic_all_comparisons}"
     echo "\\end{center}"
     echo "\\end{table}"
