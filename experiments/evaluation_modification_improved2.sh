@@ -71,8 +71,8 @@ for noise in 0 3 5 10 20 30 50; do
     for i in `seq 1 $NUMBER`; do
             INi=`printf $INPAT $i`
             OUTi=`printf $INPAT_NOISY $i`
-            echo "add_noise $noise $INi $OUTi"
-    done | parallel -j $NTHREADS
+            add_noise $noise $INi $OUTi
+    done
 
     # SIFT + RANSAC estimation
         echo "SIFT + RANSAC estimation"
@@ -126,7 +126,7 @@ for noise in 0 3 5 10 20 30 50; do
                 for FIRST_SCALE in 0 1 2 3; do
                     for NANIFOUTSIDE in 0 1; do
                         for EDGEPADDING in 0 5; do
-                            if  [ "$NANIFOUTSIDE" -eq "1" ] -o [ "$EDGEPADDING" -eq "0" ]; then
+                            if  [ "$NANIFOUTSIDE" -eq "1" -o "$EDGEPADDING" -eq "0" ]; then
                                 for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                                     #for ROBUST in 0 1 2 3 4; do
                                     for ROBUST in 0 3; do
@@ -147,7 +147,7 @@ for noise in 0 3 5 10 20 30 50; do
                                             echo "$cmd"
                                         done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
                                         #end=`date +%s.%N`
-                                        #runtime=$(echo "$end - $start" | bc) 
+                                        #runtime=$(echo "$end - $start" | bc)
                                         #echo "$runtime" > $time_ica
 
                                         # field comparison
@@ -197,7 +197,7 @@ for noise in 0 3 5 10 20 30 50; do
             for FIRST_SCALE in 0 1 2 3; do
                 for EDGEPADDING in 0 5; do
                     for NANIFOUTSIDE in 0 1; do
-                        if  [ "$NANIFOUTSIDE" -eq "1" ] -o [ "$EDGEPADDING" -eq "0" ]; then
+                        if  [ "$NANIFOUTSIDE" -eq "1" -o "$EDGEPADDING" -eq "0" ]; then
                             for ROBUST_GRADIENT in 0 1 2 3 4 5; do
                                 #for ROBUST in 0 1 2 3 4; do
                                 for ROBUST in 0 3; do

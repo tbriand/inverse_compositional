@@ -62,7 +62,7 @@ boundary=hsym
 base_out=burst
 transform=8 #homography
 if [ "$BUILD_IMAGES" -eq "1" ]; then
-   RANDOMSEED=1 create_burst $in $base_out $NUMBER $interp $boundary $L $transform
+   create_burst $in $base_out $NUMBER $interp $boundary $L $transform
 fi
 
 # comparison fields
@@ -73,8 +73,8 @@ opt=1 # to determine if comparison has h1-h2 (1) or h2^-1 o h1 - id (0)
 
 if [ "$NOISE" -eq "1" ]; then
     for i in `seq 1 $NUMBER`; do
-        echo "add_noise $noise ${base_out}_$i.tiff ${base_out}_noisy_$i.tiff"
-    done | parallel -j $NTHREADS
+        add_noise $noise ${base_out}_$i.tiff ${base_out}_noisy_$i.tiff
+    done
 fi
 
 REF=${base_out}_noisy_1.tiff
