@@ -1,13 +1,15 @@
 #!/bin/bash
 
-if [ "$#" -lt "3" ]; then
-    echo "usage:\n\t$0 noise n L"
+if [ "$#" -lt "4" ]; then
+    echo "usage:\n\t$0 in noise n L"
+    echo "image en chemin absolu"
     exit 1
 fi
 
-noise=$1
-NUMBER=$2
-L=$3
+in=$1
+noise=$2
+NUMBER=$3
+L=$4
 
 if [ -z "$BUILD_IMAGES" ]; then
     BUILD_IMAGES=0;
@@ -46,10 +48,6 @@ if [ -z "$FIRST_SCALE" ]; then
     FIRST_SCALE=0
 fi
 
-in=~/images/lena_nb.png
-in=~/images/traffic.png
-#in=~/images/homography2.png
-
 echo "Experiments with GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVELONGER EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT NSCALES=$NSCALES PRECISION=$PRECISION FIRST_SCALE=$FIRST_SCALE ROBUST=$ROBUST"
 echo "images $in"
 
@@ -60,7 +58,6 @@ mkdir $dir
 cd $dir
 
 interp=bicubic
-#interp=splineper
 boundary=hsym
 base_out=burst
 transform=8 #homography
@@ -100,13 +97,13 @@ for i in `seq 2 $NUMBER`; do
     REGi=${base_out}_$i.hom
     FIELDi=${base_out}_estimated_$i.tiff
     compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
-    compute rmse $centered $FIELDi >> $rmse_ica
+    compute mean $centered $FIELDi >> $rmse_ica
     #rm $FIELDi #$REGICAi
     #javier
     REGICAi=${base_out}_estimated_javier_$i.hom
     FIELDi=${base_out}_estimated_javier_$i.tiff
     compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
-    compute rmse $centered $FIELDi >> $rmse_ica_javier
+    compute mean $centered $FIELDi >> $rmse_ica_javier
 done
 echo "optimized"
 mean_and_std $rmse_ica 0
