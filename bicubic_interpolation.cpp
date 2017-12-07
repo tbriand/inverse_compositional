@@ -3,14 +3,10 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@ulpgc.es>
 // Copyright (C) 2014, Nelson Monzón López <nmonzon@ctim.es>
 // All rights reserved.
-
-// July 2017
-// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
-// Possibility to set to NAN values pixels that are too
-// close to the boundary of the images (or outside)
 
 #include "bicubic_interpolation.h"
 #include "transformation.h"
@@ -27,21 +23,6 @@ SMART_PARAMETER(EDGEPADDING,5)  //control the width of discarded values
   * Neumann boundary condition test
   *
 **/
-// int
-// neumann_bc (int x, int nx, bool & out)
-// {
-//   if (x<0)
-//     {
-//       if(x < -2) out = true;
-//       x = 0;
-//     }
-//   else if (x >= nx)
-//     {
-//       if(x > nx+1) out = true;
-//       x = nx - 1;
-//     }
-//   return x;
-// }
 int
 neumann_bc (int x, int nx)
 {
@@ -112,14 +93,6 @@ bicubic_interpolation(
 
     int x, y, mx, my, dx, dy, ddx, ddy;
 
-//     x = neumann_bc ((int) uu, nx, out);
-//     y = neumann_bc ((int) vv, ny, out);
-//     mx = neumann_bc ((int) uu - sx, nx, out);
-//     my = neumann_bc ((int) vv - sx, ny, out);
-//     dx = neumann_bc ((int) uu + sx, nx, out);
-//     dy = neumann_bc ((int) vv + sy, ny, out);
-//     ddx = neumann_bc ((int) uu + 2 * sx, nx, out);
-//     ddy = neumann_bc ((int) vv + 2 * sy, ny, out);
     x = neumann_bc ((int) uu, nx);
     y = neumann_bc ((int) vv, ny);
     mx = neumann_bc ((int) uu - sx, nx);
@@ -164,7 +137,7 @@ bicubic_interpolation(
 
 /**
   *
-  * Compute the bicubic interpolation of an image from a parametric trasform
+  * Compute the bicubic interpolation of an image from a parametric transform
   *
 **/
 void bicubic_interpolation(

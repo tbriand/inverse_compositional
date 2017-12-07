@@ -5,9 +5,9 @@ The Inverse Compositional Algorithm for Parametric Motion Estimation
 SUMMARY
 *******
 
-This program implements the inverse compositional algorithm for parametric
-motion estimation. It computes a planar transformation between two images, 
-including translations, similarities, affinities and homographies. It 
+This program implements the modified inverse compositional algorithm for
+parametric motion estimation. It computes a planar transformation between two
+images, including translations, similarities, affinities and homographies. It
 computes large displacements through a pyramidal scheme and uses robust 
 functionals to deal with noise and occlusions.
 
@@ -28,6 +28,10 @@ http://www.ipol.im/
 AUTHOR
 ******
 
+Thibaud Briand <thibaud.briand@enpc.fr>
+Laboratoire d'information Gaspard Monge (LIGM)
+Ecole Nationale des Ponts et Chaussées (ENPC)
+
 Javier Sánchez Pérez <jsanchez@dis.ulpgc.es> 
 Centro de Tecnologías de la Imagen (CTIM) 
 Universidad de Las Palmas de Gran Canaria
@@ -37,7 +41,7 @@ Universidad de Las Palmas de Gran Canaria
 VERSION
 *******
 
-Version 1, released on October 9, 2015
+Version 1, released on ???
 
 
 *******
@@ -49,6 +53,7 @@ under the terms of the simplified BSD License. You should have received a
 copy of this license along this program. If not, see
 <http://www.opensource.org/licenses/bsd-license.html>.
 
+Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 All rights reserved.
 

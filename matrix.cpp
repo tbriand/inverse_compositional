@@ -3,11 +3,11 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
 #include "matrix.h"
-
 #include <math.h>
 
 //Multiplication of a square matrix and a vector
@@ -64,10 +64,6 @@ void AtA(double *A, double *B, int n, int m)
 //B should be initialized to zero outside
 void sAtA(double s, double *A, double *B, int n, int m)
 {
-//   for(int i=0; i<m; i++)
-//     for(int j=0; j<m; j++)
-//       for(int k=0; k<n; k++)
-//         B[i*m+j]+=s*A[k*m+i]*A[k*m+j];
   for(int i=0; i<m; i++)
     for(int j=0; j<m; j++) {
       double sum = 0;

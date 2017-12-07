@@ -3,6 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
@@ -11,7 +12,9 @@
 
 /** 
   * 
-  *  This code implements the 'inverse compositional algorithm' proposed in
+  *  This code implements the 'modified inverse compositional algorithm'.
+  *  
+  *  The 'inverse compositional algorithm' was proposed in
   *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A 
   *         unifying framework. International Journal of Computer Vision, 
   *         56(3), 221-255.

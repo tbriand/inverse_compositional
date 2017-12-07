@@ -3,11 +3,9 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
-
-//July 2017
-//File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
 #include <time.h>
 #include <string.h>

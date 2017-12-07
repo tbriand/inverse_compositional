@@ -3,27 +3,27 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
-/**
-  *
-  *  This code implements the 'inverse compositional algorithm' proposed in
-  *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A
-  *         unifying framework. International Journal of Computer Vision,
+/** 
+  * 
+  *  This code implements the 'modified inverse compositional algorithm'.
+  *  
+  *  The 'inverse compositional algorithm' was proposed in
+  *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A 
+  *         unifying framework. International Journal of Computer Vision, 
   *         56(3), 221-255.
-  *     [2] S. Baker, R. Gross, I. Matthews, and T. Ishikawa. (2004).
-  *         Lucas-kanade 20 years on: A unifying framework: Part 2.
+  *     [2] S. Baker, R. Gross, I. Matthews, and T. Ishikawa. (2004). 
+  *         Lucas-kanade 20 years on: A unifying framework: Part 2. 
   *         International Journal of Computer Vision, 56(3), 221-255.
-  *
-  *  This implementation is for color images. It calculates the global
-  *  transform between two images. It uses robust error functions and a
+  *  
+  *  This implementation is for color images. It calculates the global 
+  *  transform between two images. It uses robust error functions and a 
   *  coarse-to-fine strategy for computing large displacements
-  *
+  * 
 **/
-
-//July 2017
-//File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
 #include <stdlib.h>
 #include <cmath>
@@ -39,7 +39,6 @@
 #include "smapa.h"
 SMART_PARAMETER(NANIFOUTSIDE,1)    //to discard boundary pixels (valued as NAN)
 SMART_PARAMETER(EDGEPADDING,5)     //boundary pixels
-SMART_PARAMETER(NORMALIZATION,0)   //to normalize the position
 SMART_PARAMETER(ROBUST_GRADIENT,3) //choice of the robust gradient
 
 /**
@@ -350,10 +349,6 @@ void inverse_compositional_algorithm(
   int size3=nparams*nparams; //size for the Hessian
   int size4=2*nx*ny*nparams;
 
-  // normalization by max(nx,ny) in the Jacobian
-  int max_size = (nx > ny) ? nx : ny;
-  double normalization_factor = 1.0/max_size;
-
   double *Ix =new double[size1];   //x derivate of the first image
   double *Iy =new double[size1];   //y derivate of the first image
   double *Iw =new double[size1];   //warp of the second image/
@@ -390,10 +385,7 @@ void inverse_compositional_algorithm(
   }
 
   //Evaluate the Jacobian
-  if( NORMALIZATION() )
-    jacobian_normalized(J, nparams, nx, ny, normalization_factor);
-  else
-    jacobian(J, nparams, nx, ny);
+  jacobian(J, nparams, nx, ny);
 
   //Compute the steepest descent images
   steepest_descent_images(Ix, Iy, J, DIJ, nparams, nx, ny, nz);
@@ -425,14 +417,6 @@ void inverse_compositional_algorithm(
 
     //Solve equation and compute increment of the motion
     error=parametric_solve(H_1, b, dp, nparams);
-
-    //Renormalization
-    //Zoom out of max(nx,ny) in each dimension
-    if( NORMALIZATION() ) {
-      for(int i=0;i<nparams;i++)
-        dp[i] *= normalization_factor;
-      zoom_in_parameters(dp, dp, nparams, 1, 1, max_size, max_size);
-    }
 
     //Update the warp x'(x;p) := x'(x;p) * x'(x;dp)^-1
     update_transform(p, dp, nparams);
@@ -489,10 +473,6 @@ void robust_inverse_compositional_algorithm(
   int size3=nparams*nparams; //size for the Hessian
   int size4=2*nx*ny*nparams;
 
-  // normalization by max(nx,ny) in the Jacobian
-  int max_size = (nx > ny) ? nx : ny;
-  double normalization_factor = 1.0/max_size;
-
   double *Ix =new double[size1];   //x derivate of the first image
   double *Iy =new double[size1];   //y derivate of the first image
   double *Iw =new double[size1];   //warp of the second image/
@@ -529,10 +509,7 @@ void robust_inverse_compositional_algorithm(
   }
   
   //Evaluate the Jacobian
-  if( NORMALIZATION() )
-    jacobian_normalized(J, nparams, nx, ny, normalization_factor);
-  else
-    jacobian(J, nparams, nx, ny);
+  jacobian(J, nparams, nx, ny);
 
   //Compute the steepest descent images
   steepest_descent_images(Ix, Iy, J, DIJ, nparams, nx, ny, nz);
@@ -575,14 +552,6 @@ void robust_inverse_compositional_algorithm(
 
     //Solve equation and compute increment of the motion
     error=parametric_solve(H_1, b, dp, nparams);
-
-    //Renormalization
-    //Zoom out of max(nx,ny) in each dimension
-    if( NORMALIZATION() ) {
-        for(int i=0;i<nparams;i++)
-          dp[i] *= normalization_factor;
-        zoom_in_parameters(dp, dp, nparams, 1, 1, max_size, max_size);
-    }
 
     //Update the warp x'(x;p) := x'(x;p) * x'(x;dp)^-1
     update_transform(p, dp, nparams);

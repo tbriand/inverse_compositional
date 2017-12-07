@@ -37,22 +37,6 @@ void jacobian
 
 /**
  *
- *  Function to compute the Jacobian matrix with normalization
- *  These parametrizations of the Jacobian are taken from the book of Zselinski
- *  (chapter 6 and 9)
- *
- */
-void jacobian_normalized
-(
-  double *J,   //computed Jacobian
-  int nparams, //number of parameters
-  int nx,      //number of columns of the image
-  int ny,      //number of rows of the image
-  double f     //normalization factor
-);
-
-/**
- *
  *  Function to update the current transform with the computed increment
  *  x'(x;p) = x'(x;p) o x'(x;dp)^-1
  *
