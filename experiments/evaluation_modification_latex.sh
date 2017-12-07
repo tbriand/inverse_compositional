@@ -151,210 +151,12 @@ SAVE=1          #saving with good precision is necessary
 #     echo "\\end{center}"
 #     echo "\\end{table}"
 
-# ICA GRADIENT
-    echo ""
-    ROBUST=0
-    FIRST_SCALE=0
-    GRAYMETHOD=0
-    NANIFOUTSIDE=1
-    EDGEPADDING=5
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\resizebox{\\textwidth}{!}{"
-    echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
-    for noise in 0 3 5 10 20 30 50; do
-            dir=noise$noise
-            cd $dir
-            echo "\\hline"
-
-            #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
-            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                rmse_ica=rmse_ica_${basefile}.txt
-                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-            done
-            line2echo="$line2echo \\\\"
-            echo "$line2echo"
-
-            #TIME
-            line2echo=" & Time"
-            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                time_ica=time_ica_${basefile}.txt
-                vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%5.0f" $vartime`"
-            done
-            if [ ! "$noise" -eq "50" ]; then
-                line2echo="$line2echo \\\\"
-            fi
-            echo "$line2echo"
-
-            cd ..
-    done
-    echo "\\end{tabular}"
-    echo "}"
-    echo "\\caption{Influence of the gradient estimator (using the L2 error function and discarding boundary pixels)}"
-    echo "\\label{fig::ic_gradient_l2}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-
-    echo ""
-    ROBUST=3
-    FIRST_SCALE=0
-    GRAYMETHOD=0
-    NANIFOUTSIDE=1
-    EDGEPADDING=5
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\resizebox{\\textwidth}{!}{"
-    echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
-    for noise in 0 3 5 10 20 30 50; do
-            dir=noise$noise
-            cd $dir
-            echo "\\hline"
-
-            #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
-            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                rmse_ica=rmse_ica_${basefile}.txt
-                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-            done
-            line2echo="$line2echo \\\\"
-            echo "$line2echo"
-
-            #TIME
-            line2echo=" & Time"
-            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                time_ica=time_ica_${basefile}.txt
-                vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%5.0f" $vartime`"
-            done
-            if [ ! "$noise" -eq "50" ]; then
-                line2echo="$line2echo \\\\"
-            fi
-            echo "$line2echo"
-
-            cd ..
-    done
-    echo "\\end{tabular}"
-    echo "}"
-    echo "\\caption{Influence of the gradient estimator (using the Lorentzian error function and discarding boundary pixels)}"
-    echo "\\label{fig::ic_gradient_lorentzian}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-
-# ICA FIRST SCALE
-    echo ""
-    ROBUST=0
-    ROBUST_GRADIENT=3
-    GRAYMETHOD=0
-    NANIFOUTSIDE=1
-    EDGEPADDING=5
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
-    for noise in 0 3 5 10 20 30 50; do
-            dir=noise$noise
-            cd $dir
-            echo "\\hline"
-
-            #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
-            for FIRST_SCALE in 0 1 2 3; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                rmse_ica=rmse_ica_${basefile}.txt
-                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-            done
-            line2echo="$line2echo \\\\"
-            echo "$line2echo"
-
-            #TIME
-            line2echo=" & Time"
-            for FIRST_SCALE in 0 1 2 3; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                time_ica=time_ica_${basefile}.txt
-                vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%5.0f" $vartime`"
-            done
-            if [ ! "$noise" -eq "50" ]; then
-                line2echo="$line2echo \\\\"
-            fi
-            echo "$line2echo"
-
-            cd ..
-    done
-    echo "\\end{tabular}"
-    echo "\\caption{Influence of the first scale (using the L2 error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
-    echo "\\label{fig::ic_first_scale_l2}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-
-    echo ""
-    ROBUST=3
-    ROBUST_GRADIENT=3
-    GRAYMETHOD=0
-    NANIFOUTSIDE=1
-    EDGEPADDING=5
-    echo "\\begin{table}"
-    echo "\\begin{center}"
-    echo "\\begin{tabular}{l|l|l|l|l|l}"
-    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
-    for noise in 0 3 5 10 20 30 50; do
-            dir=noise$noise
-            cd $dir
-            echo "\\hline"
-
-            #RMSE
-            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
-            for FIRST_SCALE in 0 1 2 3; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                rmse_ica=rmse_ica_${basefile}.txt
-                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
-            done
-            line2echo="$line2echo \\\\"
-            echo "$line2echo"
-
-            #TIME
-            line2echo=" & Time"
-            for FIRST_SCALE in 0 1 2 3; do
-                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-                # field comparison
-                time_ica=time_ica_${basefile}.txt
-                vartime=`cat $time_ica`
-                line2echo="$line2echo & `printf "%5.0f" $vartime`"
-            done
-            if [ ! "$noise" -eq "50" ]; then
-                line2echo="$line2echo \\\\"
-            fi
-            echo "$line2echo"
-
-            cd ..
-    done
-    echo "\\end{tabular}"
-    echo "\\caption{Influence of the first scale (using the Lorentzian error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
-    echo "\\label{fig::ic_first_scale_lorentzian}"
-    echo "\\end{center}"
-    echo "\\end{table}"
-
 # ICA COLOR
 c=`imprintf %c burst_1.tiff`
 if [ "$c" -eq "3" ]; then
     echo ""
     FIRST_SCALE=0
-    ROBUST_GRADIENT=3
+    ROBUST_GRADIENT=0
     EDGEPADDING=5
     NANIFOUTSIDE=1
     echo "\\begin{table}"
@@ -405,6 +207,204 @@ if [ "$c" -eq "3" ]; then
     echo "\\end{center}"
     echo "\\end{table}"
 fi
+
+# ICA GRADIENT
+    echo ""
+    ROBUST=0
+    FIRST_SCALE=0
+    GRAYMETHOD=1
+    NANIFOUTSIDE=1
+    EDGEPADDING=5
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\resizebox{\\textwidth}{!}{"
+    echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
+            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                rmse_ica=rmse_ica_${basefile}.txt
+                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                time_ica=time_ica_${basefile}.txt
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "}"
+    echo "\\caption{Influence of the gradient estimator (using the L2 error function and discarding boundary pixels)}"
+    echo "\\label{fig::ic_gradient_l2}"
+    echo "\\end{center}"
+    echo "\\end{table}"
+
+    echo ""
+    ROBUST=3
+    FIRST_SCALE=0
+    GRAYMETHOD=1
+    NANIFOUTSIDE=1
+    EDGEPADDING=5
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\resizebox{\\textwidth}{!}{"
+    echo "\\begin{tabular}{l|l|l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l|}{} & Central Differences & Hypomode & Farid 3x3 & Farid 5x5 & Gaussian 3 & Gaussian 6 \\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$ \sigma = $noise $} & EPE"
+            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                rmse_ica=rmse_ica_${basefile}.txt
+                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for ROBUST_GRADIENT in 0 1 2 3 4 5; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                time_ica=time_ica_${basefile}.txt
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "}"
+    echo "\\caption{Influence of the gradient estimator (using the Lorentzian error function and discarding boundary pixels)}"
+    echo "\\label{fig::ic_gradient_lorentzian}"
+    echo "\\end{center}"
+    echo "\\end{table}"
+
+# ICA FIRST SCALE
+    echo ""
+    ROBUST=0
+    ROBUST_GRADIENT=3
+    GRAYMETHOD=1
+    NANIFOUTSIDE=1
+    EDGEPADDING=5
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\begin{tabular}{l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
+            for FIRST_SCALE in 0 1 2 3; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                rmse_ica=rmse_ica_${basefile}.txt
+                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for FIRST_SCALE in 0 1 2 3; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                time_ica=time_ica_${basefile}.txt
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "\\caption{Influence of the first scale (using the L2 error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
+    echo "\\label{fig::ic_first_scale_l2}"
+    echo "\\end{center}"
+    echo "\\end{table}"
+
+    echo ""
+    ROBUST=3
+    ROBUST_GRADIENT=3
+    GRAYMETHOD=1
+    NANIFOUTSIDE=1
+    EDGEPADDING=5
+    echo "\\begin{table}"
+    echo "\\begin{center}"
+    echo "\\begin{tabular}{l|l|l|l|l|l}"
+    echo "\\multicolumn{2}{l|}{} & $ s_0 = 0 $ & $ s_0 = 1 $ & $ s_0 = 2 $ & $ s_0 = 3 $ \\\\"
+    for noise in 0 3 5 10 20 30 50; do
+            dir=noise$noise
+            cd $dir
+            echo "\\hline"
+
+            #RMSE
+            line2echo="\\multirow{2}{0.1\\linewidth}{$\sigma = $noise$} & EPE"
+            for FIRST_SCALE in 0 1 2 3; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                rmse_ica=rmse_ica_${basefile}.txt
+                line2echo="$line2echo & `mean_and_std $rmse_ica 0`"
+            done
+            line2echo="$line2echo \\\\"
+            echo "$line2echo"
+
+            #TIME
+            line2echo=" & Time"
+            for FIRST_SCALE in 0 1 2 3; do
+                basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
+                # field comparison
+                time_ica=time_ica_${basefile}.txt
+                vartime=`cat $time_ica`
+                line2echo="$line2echo & `printf "%5.0f" $vartime`"
+            done
+            if [ ! "$noise" -eq "50" ]; then
+                line2echo="$line2echo \\\\"
+            fi
+            echo "$line2echo"
+
+            cd ..
+    done
+    echo "\\end{tabular}"
+    echo "\\caption{Influence of the first scale (using the Lorentzian error function and the Farid 5x5 kernel estimator and discarding boundary pixels)}"
+    echo "\\label{fig::ic_first_scale_lorentzian}"
+    echo "\\end{center}"
+    echo "\\end{table}"
 
 # COMPARISON ALL METHODS
     echo ""
