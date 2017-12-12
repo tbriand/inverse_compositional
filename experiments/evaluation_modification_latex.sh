@@ -9,6 +9,11 @@ else
     dir=$1
 fi
 
+if [ ! -d "$dir" ]; then
+    echo "No directory found";
+    exit;
+fi
+
 cd $dir
 
 # sift files

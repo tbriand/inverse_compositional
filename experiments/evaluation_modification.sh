@@ -3,7 +3,6 @@
 if [ "$#" -lt "3" ]; then
     echo "usage:\n\t$0 in number displacement_max_corner [dir]"
     echo "example toto.tiff 10 5"
-    echo "image en chemin absolu"
     exit 1
 fi
 
@@ -25,8 +24,11 @@ else
     dir=$4
 fi
 
+ref=ref.tiff
+
 rm -rf $dir
 mkdir $dir
+cp $in $dir/$ref
 cd $dir
 
 # create burst
@@ -36,7 +38,7 @@ boundary=hsym
 base_out=burst
 transform=8 #homography
 if [ "$BUILD_IMAGES" -eq "1" ]; then
-    create_burst $in $base_out $NUMBER $interp $boundary $L $transform
+    create_burst $ref $base_out $NUMBER $interp $boundary $L $transform
 fi
 
 # sift parameters
@@ -61,8 +63,8 @@ PRECISION=0.001
 
 # comparison fields
 centered=0
-w=`imprintf %w $in`
-h=`imprintf %h $in`
+w=`imprintf %w $ref`
+h=`imprintf %h $ref`
 opt=1 # to determine if comparison has h1-h2 (1) or h2^-1 o h1 - id (0)
 
 # image parameters
