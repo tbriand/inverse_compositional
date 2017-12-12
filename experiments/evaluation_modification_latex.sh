@@ -3,7 +3,12 @@
 export LC_NUMERIC=C
 
 # change directory
-dir=evaluation_modification
+if [ -z "$1" ]; then
+    dir=evaluation_modification
+else
+    dir=$1
+fi
+
 cd $dir
 
 # sift files

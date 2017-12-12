@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -lt "3" ]; then
-    echo "usage:\n\t$0 in number displacement_max_corner"
+    echo "usage:\n\t$0 in number displacement_max_corner [dir]"
     echo "example toto.tiff 10 5"
     echo "image en chemin absolu"
     exit 1
@@ -19,7 +19,12 @@ if [ -z "$BUILD_IMAGES" ]; then
 fi    
 
 # create directory
-dir=evaluation_modification
+if [ -z "$4" ]; then
+    dir=evaluation_modification
+else
+    dir=$4
+fi
+
 rm -rf $dir
 mkdir $dir
 cd $dir
