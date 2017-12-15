@@ -18,6 +18,10 @@
 
 #define ZOOM_SIGMA_ZERO 0.6
 
+// #include <stdlib.h>
+// #include "smapa.h"
+// SMART_PARAMETER(INTERPZOOM,1)
+
 /**
   *
   * Compute the size of a zoomed image from the zoom factor
@@ -51,9 +55,10 @@ void zoom_out
   double factor //zoom factor between 0 and 1
 )
 {
-  int nxx, nyy, original_size =nx*ny*nz; 
+  int nxx, nyy, original_size =nx*ny*nz;
+  double ifactor = 1.0/factor;
   double *Is=new double[original_size];
-
+  
   for (int i=0; i<original_size; i++)
     Is[i]=I[i];
 
@@ -61,23 +66,59 @@ void zoom_out
   zoom_size(nx, ny, nxx, nyy, factor);
   
   //compute the Gaussian sigma for smoothing
-  double sigma=ZOOM_SIGMA_ZERO*sqrt(1.0/(factor*factor)-1.0);
+  double sigma=ZOOM_SIGMA_ZERO*sqrt(ifactor*ifactor-1.0);
 
   //pre-smooth the image
   gaussian(Is, nx, ny, nz, sigma);
   
-  // re-sample the image using bicubic interpolation 
-  for(int index_color=0; index_color<nz; index_color++)
-  {
-    for (int i1=0; i1<nyy; i1++)
-      for (int j1=0; j1<nxx; j1++)
-      {
-        double i2=(double)i1/factor;
-        double j2=(double)j1/factor;
-        Iout[(i1*nxx+j1)*nz+index_color]=
-           bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);  
-      }   
-  }
+//   if( INTERPZOOM() == 0 ) { //original
+//     for(int index_color=0; index_color<nz; index_color++)
+//     {
+//         for (int i1=0; i1<nyy; i1++)
+//         for (int j1=0; j1<nxx; j1++)
+//         {
+//             double i2=(double)i1/factor;
+//             double j2=(double)j1/factor;
+//             Iout[(i1*nxx+j1)*nz+index_color]=
+//             bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);  
+//         }   
+//     }
+//   }
+//   if( INTERPZOOM() == 1 ) { // change order loop
+//         for (int i1=0; i1<nyy; i1++)
+//         for (int j1=0; j1<nxx; j1++)
+//         {
+//             double i2=(double)i1/factor;
+//             double j2=(double)j1/factor;
+//             for(int index_color=0; index_color<nz; index_color++)
+//             Iout[(i1*nxx+j1)*nz+index_color]=
+//             bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);  
+//         }   
+//   }
+//   else {
+  if ( (int) ifactor == ifactor) {
+      for (int i1=0; i1<nyy; i1++)
+        for (int j1=0; j1<nxx; j1++)
+        {
+            int i2= i1*ifactor;
+            int j2= j1*ifactor;
+            for(int index_color=0; index_color<nz; index_color++)
+            Iout[(i1*nxx+j1)*nz+index_color]=Is[(i2*nx+j2)*nz+index_color];  
+        }
+    }
+    else {
+    // re-sample the image using bicubic interpolation 
+        for (int i1=0; i1<nyy; i1++)
+        for (int j1=0; j1<nxx; j1++)
+        {
+            double i2=(double)i1*ifactor;
+            double j2=(double)j1*ifactor;
+            for(int index_color=0; index_color<nz; index_color++)
+            Iout[(i1*nxx+j1)*nz+index_color]=
+            bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);  
+        }  
+    }
+  //}
   
   delete []Is;
 }
