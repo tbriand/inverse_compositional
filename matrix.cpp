@@ -73,6 +73,13 @@ void sAtA(double s, double *A, double *B, int n, int m)
     }
 }
 
+//Multiplication with a scalar
+//B should be initialized to zero outside
+void sA(double s, double *A, double *B, int m)
+{
+  for(int i=0; i<m*m; i++)
+    B[i] += s*A[i];
+}
 
 //Function to compute the inverse of a matrix
 //through Gaussian elimination

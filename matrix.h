@@ -29,6 +29,10 @@ void AtA(double *A, double *B, int n, int m);
 //B should be initialized to zero outside
 void sAtA(double s, double *A, double *B, int n, int m);
 
+//Multiplication with a scalar
+//B should be initialized to zero outside
+void sA(double s, double *A, double *B, int m);
+
 //Function to compute the inverse of a matrix
 //through Gaussian elimination
 int inverse(double *A, double *A_1, int N = 3);
