@@ -56,7 +56,6 @@ ref_number=1 # the reference image is assumed to be the first image
 TIMEFORMAT="%U"
 
 # ICA parameters
-NORMALIZATION=0
 SAVE=1
 SCALES=5
 PRECISION=0.001
@@ -122,7 +121,7 @@ for noise in 0 3 5 10 20 30 50; do
                                         { time for i in `seq 2 $NUMBER`; do
                                             INi=`printf $INPAT_NOISY $i`
                                             REGi=`printf $regpat_ica $i`
-                                            cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+                                            cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                                             echo "$cmd"
                                         done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
 
@@ -162,7 +161,7 @@ for noise in 0 3 5 10 20 30 50; do
                                     { time for i in `seq 2 $NUMBER`; do
                                         INi=`printf $INPAT_NOISY $i`
                                         REGi=`printf $regpat_ica $i`
-                                        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE NORMALIZATION=$NORMALIZATION EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+                                        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
                                         echo "$cmd"
                                     done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
 
