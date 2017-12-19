@@ -40,8 +40,8 @@
 SMART_PARAMETER(NANIFOUTSIDE,1)    //to discard boundary pixels (valued as NAN)
 SMART_PARAMETER(EDGEPADDING,5)     //boundary pixels
 SMART_PARAMETER(ROBUST_GRADIENT,3) //choice of the robust gradient
+SMART_PARAMETER(PRECOMPG,1)        //precompute GTG
 
-SMART_PARAMETER(PRECOMPG,1)
 /**
  *
  *  Derivative of robust error functions
@@ -99,14 +99,11 @@ void steepest_descent_images
 {
   int k=0;
 
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++) {
-      int p=i*nx+j;
+  for(int p=0; p<nx*ny; p++)
       for(int c=0; c<nz; c++)
         for(int n=0; n<nparams; n++)
           G[k++]=Ix[p*nz+c]*J[2*p*nparams+n]+
                    Iy[p*nz+c]*J[2*p*nparams+n+nparams];
-    }
 }
 
 /**
@@ -129,11 +126,8 @@ void precomputation_hessian
     GTG[k] = 0;
 
   //calculate the hessian in a neighbor window
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++) {
-        int p = i*nx + j;
+  for(int p=0; p<nx*ny; p++)
         AtA(&(G[p*nz*nparams]), &(GTG[p*nparams*nparams]), nz, nparams);
-    }
 }
 
 /**
@@ -156,13 +150,11 @@ void compute_hessian(
     H[k] = 0;
   
   //calculate the hessian in a neighbor window
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++) {
+  for(int p=0; p<nx*ny; p++) {
       //Discarded if NAN
-      int p = i*nx + j;
       if ( std::isfinite(rho[p]) && std::isfinite(GTG[p*nparams*nparams]))
         sA(rho[p], &(GTG[p*nparams*nparams]), H, nparams);
-    }
+  }
 }
 
 /**
@@ -186,12 +178,10 @@ void hessian
     H[k] = 0;
 
   //calculate the hessian in a neighbor window
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++) {
-        int p = i*nx + j;
+  for(int p=0; p<nx*ny; p++) {
         if ( std::isfinite(G[p*nz*nparams]) ) //Discarded if NAN
           AtA(&(G[p*nz*nparams]), H, nz, nparams);
-    }
+  }
 }
 
 
@@ -217,13 +207,11 @@ void hessian
     H[k] = 0;
 
   //calculate the hessian in a neighbor window
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++) {
+  for(int p=0; p<nx*ny; p++) {
       //Discarded if NAN
-      int p = i*nx + j;
       if ( std::isfinite(rho[p]) && std::isfinite(G[p*nz*nparams]))
         sAtA(rho[p], &(G[p*nz*nparams]), H, nz, nparams);
-    }
+  }
 }
 
 
@@ -281,18 +269,15 @@ void robust_error_function
   int nz        //number of channels
 )
 {
-      for(int i=0;i<ny;i++) {
-          for(int j=0;j<nx;j++) {
-              int p = i*nx + j;
-              if ( DI[p*nz+0] == NAN)
-                  rho[i*nx+j] = NAN; // Already discarded for I2
-              else {
-                  double norm=0.0;
-                  for(int c=0;c<nz;c++) norm+=DI[p*nz+c]*DI[p*nz+c];
-                  rho[p]=rhop(norm,lambda,type);
-              }
-          }
+    for(int p=0; p<nx*ny; p++) {
+      if ( DI[p*nz+0] == NAN)
+        rho[p] = NAN; // Already discarded for I2
+      else {
+        double norm=0.0;
+        for(int c=0;c<nz;c++) norm+=DI[p*nz+c]*DI[p*nz+c];
+        rho[p]=rhop(norm,lambda,type);
       }
+    }
 }
 
 
@@ -316,15 +301,10 @@ void independent_vector
   for(int k=0; k<nparams; k++)
     b[k]=0;
 
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++)
-    { //Discard if NAN
-      int p = i*nx + j;
+  for(int p=0; p<nx*ny; p++) { 
+      //Discard if NAN
       if ( std::isfinite(G[p*nparams*nz]) && std::isfinite(DI[p*nz]) )
-      Atb(
-        &(G[p*nparams*nz]),
-        &(DI[p*nz]), b, nz, nparams
-      );
+        Atb(&(G[p*nparams*nz]), &(DI[p*nz]), b, nz, nparams);
     }
 }
 
@@ -351,16 +331,11 @@ void independent_vector
   for(int k=0; k<nparams; k++)
     b[k]=0;
 
-  for(int i=0; i<ny; i++)
-    for(int j=0; j<nx; j++)
-    { //Discard if NAN
-      int p = i*nx + j;
+  for(int p=0; p<nx*ny; p++) {
+      //Discard if NAN
       if ( std::isfinite(G[p*nparams*nz]) && std::isfinite(DI[p*nz]) )
-      sAtb(
-        rho[p], &(G[p*nparams*nz]),
-        &(DI[p*nz]), b, nz, nparams
-      );
-    }
+        sAtb(rho[p], &(G[p*nparams*nz]), &(DI[p*nz]), b, nz, nparams);
+   }
 }
 
 
