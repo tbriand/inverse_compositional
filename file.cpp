@@ -77,21 +77,22 @@ void save_normalize_image
   char *fname,  //file name
   double *f,    //output image
   int nx,       //number of columns of the image
-  int ny        //number of rows of the image
+  int ny,       //number of rows of the image
+  int nz        //number of channels of the image
 )
 {
-  float max=0, min=999;
-  for(int i=0;i<nx*ny;i++)
+  float max=-9999, min=9999;
+  for(int i=0;i<nx*ny*nz;i++)
   {
     if(f[i]<min)min=f[i];
     if(f[i]>max)max=f[i];
   }
   
-  float *ff=new float[nx*ny];
-  for(int i=0;i<nx*ny;i++) ff[i]=255.0;
-  if(max!=min)
-    for(int i=0;i<nx*ny;i++) ff[i]=(float)255.0*(f[i]-min)/(max-min);
-  iio_save_image_float(fname, ff, nx, ny);
+  float *ff=new float[nx*ny*nz];
+  for(int i=0;i<nx*ny*nz;i++) ff[i]=255.0;
+  if(max>min)
+    for(int i=0;i<nx*ny*nz;i++) ff[i]=(float)255.0*(f[i]-min)/(max-min);
+  iio_save_image_float_vec(fname, ff, nx, ny, nz);
   delete []ff;
 }
 
@@ -199,7 +200,7 @@ void save
 /**
  *
  *  Function to read the parameters in ascii format
- *  It reads a header with: nparams nx ny
+ *  It reads a header with: nparams
  *  Then it reads the parameters 
  *
  */

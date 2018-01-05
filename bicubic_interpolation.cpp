@@ -143,7 +143,7 @@ bicubic_interpolation(
 void bicubic_interpolation(
   double *input,   //image to be warped
   double *output,  //warped output image with bicubic interpolation
-  double *params,  //x component of the vector field
+  double *params,  //parameters of the transformation
   int nparams,     //number of parameters of the transform
   int nx,          //width of the image
   int ny,          //height of the image

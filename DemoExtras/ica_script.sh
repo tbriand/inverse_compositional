@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -lt "11" ]; then
-    echo "usage:\n\t$0 nscales zoom eps transform robust lambda dbp edgepadding color gradient first_scale"
+if [ "$#" -lt "12" ]; then
+    echo "usage:\n\t$0 nscales zoom eps transform robust lambda dbp edgepadding color gradient first_scale std"
     exit 1
 fi
 
@@ -16,26 +16,36 @@ edgepadding=$8
 color=$9
 gradient=${10}
 first_scale=${11}
+std=${12}
 
 if [ "$color" = "True" ]; then
     GRAYMETHOD=1
 else
     GRAYMETHOD=0
 fi
+
 if [ "$dbp" = "True" ]; then
     NANIFOUTSIDE=1
 else
     NANIFOUTSIDE=0
-    EDGEPADDING=0
+    edgepadding=0
 fi
 
 ref=input_0.png
+ref_noisy=input_noisy_0.png
 warped=input_1.png
+warped_noisy=input_noisy_1.png
 file=transformation.txt
+if [ -f input_2.txt ]; then
+    file2=input_2.txt
+else
+    file2=""
+fi
 
-GRAYMETHOD=$GRAYMETHOD EDGEPADDING=$dbp NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$gradient inverse_compositional_algorithm $ref $warped -f $file -z $zoom -n $nscales -r $robust -e $eps -t $transform -s $first_scale -v
-
-# créer l'image recalee
-# faire la différence avec l'image de référence
-# ajouter bruit
-# Si vérité terrain calculer the EPE image, afficher vérité terrain
+echo "Standard deviation of the noise added: $std"
+add_noise $ref $ref_noisy $std
+add_noise $warped $warped_noisy $std
+echo ""
+GRAYMETHOD=$GRAYMETHOD EDGEPADDING=$edgepadding NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$gradient inverse_compositional_algorithm $ref_noisy $warped_noisy -f $file -z $zoom -n $nscales -r $robust -e $eps -t $transform -s $first_scale -v
+echo ""
+NANIFOUTSIDE=1 EDGEPADDING=0 generate_output $ref_noisy $warped_noisy $file $file2

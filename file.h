@@ -55,7 +55,8 @@ void save_normalize_image
   char *fname,  //file name
   double *f,    //output image
   int nx,       //number of columns of the image
-  int ny        //number of rows of the image
+  int ny,       //number of rows of the image
+  int nz        //number of channels of the image
 );
 
 
