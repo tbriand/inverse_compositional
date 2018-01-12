@@ -67,15 +67,17 @@ void print_output(
   int nz       //number of channels
 )
 {
-  double *Iw=new double[nx*ny*nz];  
+  double *Iw=new double[nx*ny*nz];
   double *DI=new double[nx*ny*nz];
   double *EPE=new double[nx*ny];
 
   //compute the interpolated image I2(x')
   bicubic_interpolation(I2, Iw, p, nparams, nx, ny, nz);
-  char outfile[50]="output_estimated.png";
-  save_image(outfile,Iw,nx,ny,nz);
-
+  char outfile[50]="output_estimated.tiff";
+  save_image(outfile, Iw, nx, ny, nz);
+  char outfile2[50]="output_estimated.png";
+  save_image(outfile2, Iw, nx, ny, nz);
+  
   //compute the difference image I2(x') - I1(x) and the RMSE
   double sum=0.0, rmse=9999;
   int size = 0;
@@ -89,8 +91,10 @@ void print_output(
   if (size > 0)
       rmse = sqrt(sum/size);
   printf("RMSE(I1(x),I2(x'))=%lf\n",rmse);
-  char diff_image[50]="diff_image.png";
-  save_normalize_image(diff_image, DI, nx, ny, nz);
+  char diff_image[50]="diff_image.tiff";
+  save_image(diff_image, DI, nx, ny, nz);
+  char diff_image2[50]="diff_image.png";
+  save_normalize_image(diff_image2, DI, nx, ny, nz);
 
   //computing the EPE field
   double m1[9], m2[9], mean = 0.0;
@@ -104,10 +108,12 @@ void print_output(
             mean += tmp;
         }
     }
-    mean /= (nx*ny);    
+    mean /= (nx*ny);
     printf("EPE=%lf\n", mean);
-    char epefile[50]="epe.png";
-    save_normalize_image(epefile, EPE, nx, ny, 1);
+    char epefile[50]="epe.tiff";
+    save_image(epefile, EPE, nx, ny, 1);
+    char epefile2[50]="epe.png";
+    save_normalize_image(epefile2, EPE, nx, ny, 1);
   }
   else
     printf("EPE=-N/A-\n");
@@ -133,14 +139,14 @@ int main(int c, char *v[])
       printf("<Usage>: %s image1 image2 transform1 [transform2]\n", v[0]);
       return(EXIT_FAILURE);
   }
-  
+
   int nx, ny, nz, nx1, ny1, nz1;
 
   char  *image1= v[1];
   char  *image2= v[2];
   const char  *transform1= v[3];
   const char  *transform2= c > 4 ? v[4] : "-";
-  
+
   //read the input images
   double *I1, *I2;
   bool correct1=read_image(image1, &I1, nx, ny, nz);
@@ -151,7 +157,7 @@ int main(int c, char *v[])
       printf("Images should have the same size\n");
       return(EXIT_FAILURE);
   }
-  
+
   int n1 = 0, n2 = 0;
   double *p1=NULL, *p2=NULL;
   read(transform1, &p1, n1);
@@ -164,6 +170,6 @@ int main(int c, char *v[])
   free (I2);
   delete []p1;
   delete []p2;
-    
+
   return(EXIT_SUCCESS);
 }
