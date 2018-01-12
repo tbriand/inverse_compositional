@@ -16,7 +16,7 @@
 #include "inverse_compositional_algorithm.h"
 #include "file.h"
 
-#define PAR_DEFAULT_NSCALES 5
+#define PAR_DEFAULT_NSCALES 0
 #define PAR_DEFAULT_ZFACTOR 0.5
 #define PAR_DEFAULT_TOL 0.001
 #define PAR_DEFAULT_TYPE 8
@@ -155,7 +155,7 @@ int read_parameters(
     }
 
     //check parameter values
-    if(nscales <= 0)           nscales=PAR_DEFAULT_NSCALES;
+    //if(nscales <= 0)           nscales=PAR_DEFAULT_NSCALES;
     if(zfactor<=0||zfactor>=1) zfactor=PAR_DEFAULT_ZFACTOR;
     if(TOL<0)                  TOL    =PAR_DEFAULT_TOL;
     if(nparams!=2 && nparams!=3 && nparams!=4 &&
@@ -245,8 +245,8 @@ int main (int argc, char *argv[])
         );
 
       //limit the number of scales according to image size (min 32x32)
-      const double N=1+log(std::min(nx, ny)/32.)/log(1./zfactor);
-      if ((int) N<nscales) nscales=(int) N;
+      int N=1+log(std::min(nx, ny)/32.)/log(1./zfactor);
+      if (N<nscales || nscales <= 0) nscales= N;
 
       //allocate memory for the parametric model
       double *p=new double[nparams];
