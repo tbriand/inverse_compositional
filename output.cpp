@@ -69,6 +69,7 @@ void print_output(
 {
   double *Iw=new double[nx*ny*nz];
   double *DI=new double[nx*ny*nz];
+  double *DIrmse= new double[nx*ny];
   double *EPE=new double[nx*ny];
 
   //compute the interpolated image I2(x')
@@ -95,6 +96,17 @@ void print_output(
   save_image(diff_image, DI, nx, ny, nz);
   char diff_image2[50]="diff_image.png";
   save_normalize_image(diff_image2, DI, nx, ny, nz);
+  
+  //compute the pointwise rmse of the difference image
+  for(int p=0; p<nx*ny; p++) {
+    double norm = 0.0;
+    for(int c=0; c<nz; c++) norm += DI[p*nz+c]*DI[p*nz+c];
+    DIrmse[p] = sqrt(norm/nz);
+  }
+  char diff_image_rmse[50]="diff_image_rmse.tiff";
+  save_image(diff_image_rmse, DIrmse, nx, ny, 1);
+  char diff_image_rmse2[50]="diff_image_rmse.png";
+  save_normalize_image(diff_image_rmse2, DIrmse, nx, ny, 1);
 
   //computing the EPE field
   double m1[9], m2[9], mean = 0.0;
@@ -130,6 +142,7 @@ void print_output(
   delete []Iw;
   delete []DI;
   delete []EPE;
+  delete []DIrmse;
 }
 
 
