@@ -255,7 +255,7 @@ void difference_image
 
 /**
  *
- *  Function to store the values of p'((I2(x'(x;p))-I1(x))²)
+ *  Function to store the values of p'((I2(x'(x;p))-I1(x))^2)
  *
  */
 void robust_error_function
