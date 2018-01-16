@@ -39,7 +39,10 @@ if [ ! -s $time_ica ]; then
     { time for i in `seq 2 $NUMBER`; do
         INi=`printf $INPAT_NOISY $i`
         REGi=`printf $regpat_ica $i`
-        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+        # TEST
+        #cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $INi $REF -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+        # END TEST
         echo "$cmd"
     done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
 

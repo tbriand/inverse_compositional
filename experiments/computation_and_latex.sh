@@ -41,6 +41,14 @@ if [ "$BUILD_IMAGES" -eq "1" ]; then
     create_burst $ref $base_out $NUMBER $interp $boundary $L $transform
 fi
 
+
+# TEST with inverse homography
+for i in `seq 2 $NUMBER`; do
+            REGi=${base_out}_$i.hom
+            invert_homography_ica "`cat $REGi`" $REGi
+done
+# END TEST
+
 # sift parameters
 regpat=sift_%i.tiff #just used to set the name of the homography files ...
 regpat_sift=sift_%i.hom # to this value (shitty script)
@@ -93,6 +101,9 @@ for noise in 0 3 5 10 20 30 50; do
             REGSIFTi=`printf $regpat_sift $i`
             REGi=`printf $TRUE_REGPAT $i`
             FIELDi=`printf $field_sift $i`
+# TEST with inverse homography
+            invert_homography_ica "`cat $REGSIFTi`" $REGSIFTi
+# END TEST
             compare_homography $w $h "`cat $REGSIFTi`" "`cat $REGi`" $FIELDi $opt
             compute mean $centered $FIELDi >> $rmse_sift
             rm $FIELDi $REGSIFTi
@@ -174,29 +185,3 @@ for noise in 0 3 5 10 20 30 50; do
 done
 
 cd ..
-
-# echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
-#             basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
-#             regpat_ica=ica_${basefile}_%i.hom
-#             time_ica=time_ica_${basefile}.txt
-#             field_ica=field_ica_${basefile}_%i.tiff
-#             rmse_ica=rmse_ica_${basefile}.txt
-#             max_ica=max_ica_${basefile}.txt
-# 
-#             # ICA estimation
-#             { time for i in `seq 2 $NUMBER`; do
-#                 INi=`printf $INPAT_NOISY $i`
-#                 REGi=`printf $regpat_ica $i`
-#                 cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
-#                 echo "$cmd"
-#             done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
-# 
-#             # field comparison
-#             for i in `seq 2 $NUMBER`; do
-#                 REGICAi=`printf $regpat_ica $i`
-#                 REGi=`printf $TRUE_REGPAT $i`
-#                 FIELDi=`printf $field_ica $i`
-#                 compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
-#                 compute mean $centered $FIELDi >> $rmse_ica
-#                 rm $FIELDi $REGICAi
-#             done
