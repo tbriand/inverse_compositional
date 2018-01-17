@@ -5,7 +5,7 @@ if [ "$#" -lt "12" ]; then
     exit 1
 fi
 
-nscales=$1 
+nscales=$1
 zoom=$2
 eps=$3
 transform=$4

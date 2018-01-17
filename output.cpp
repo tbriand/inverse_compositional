@@ -78,7 +78,7 @@ void print_output(
   save_image(outfile, Iw, nx, ny, nz);
   char outfile2[50]="output_estimated.png";
   save_image(outfile2, Iw, nx, ny, nz);
-  
+
   //compute the difference image I2(x') - I1(x) and the RMSE
   double sum=0.0, rmse=9999;
   int size = 0;
@@ -96,7 +96,7 @@ void print_output(
   save_image(diff_image, DI, nx, ny, nz);
   char diff_image2[50]="diff_image.png";
   save_normalize_image(diff_image2, DI, nx, ny, nz);
-  
+
   //compute the pointwise rmse of the difference image
   for(int p=0; p<nx*ny; p++) {
     double norm = 0.0;
