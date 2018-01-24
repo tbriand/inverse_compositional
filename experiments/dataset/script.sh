@@ -57,10 +57,11 @@ mv output_estimated.tiff $out
 mv diff_image_rmse.tiff $diff
 
 #ic optimized
+first=0
 out=ic_optimized.tiff
 diff=ic_optimized_diff.tiff
 HOMO=ic_optimized.hom
-EDGEPADDING=5 NANIFOUTSIDE=1 ROBUST_GRADIENT=3 GRAYMETHOD=1 inverse_compositional_algorithm $ref $im -f $HOMO -r $ROBUST -n $NSCALES -v
+EDGEPADDING=5 NANIFOUTSIDE=1 ROBUST_GRADIENT=3 GRAYMETHOD=1 inverse_compositional_algorithm $ref $im -f $HOMO -r $ROBUST -n $NSCALES -s $first -v
 EDGEPADDING=0 generate_output $ref $im $HOMO
 mv output_estimated.tiff $out
 mv diff_image_rmse.tiff $diff
