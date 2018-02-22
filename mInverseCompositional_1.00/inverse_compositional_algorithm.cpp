@@ -3,26 +3,26 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
-// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
-/** 
-  * 
+/**
+  *
   *  This code implements the 'modified inverse compositional algorithm'.
-  *  
+  *
   *  The 'inverse compositional algorithm' was proposed in
-  *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A 
-  *         unifying framework. International Journal of Computer Vision, 
+  *     [1] S. Baker, and I. Matthews. (2004). Lucas-kanade 20 years on: A
+  *         unifying framework. International Journal of Computer Vision,
   *         56(3), 221-255.
-  *     [2] S. Baker, R. Gross, I. Matthews, and T. Ishikawa. (2004). 
-  *         Lucas-kanade 20 years on: A unifying framework: Part 2. 
+  *     [2] S. Baker, R. Gross, I. Matthews, and T. Ishikawa. (2004).
+  *         Lucas-kanade 20 years on: A unifying framework: Part 2.
   *         International Journal of Computer Vision, 56(3), 221-255.
-  *  
-  *  This implementation is for color images. It calculates the global 
-  *  transform between two images. It uses robust error functions and a 
+  *
+  *  This implementation is for color images. It calculates the global
+  *  transform between two images. It uses robust error functions and a
   *  coarse-to-fine strategy for computing large displacements
-  * 
+  *
 **/
 
 #include <stdlib.h>
@@ -72,14 +72,13 @@ double rhop(
   return result;
 }
 
-
 /**
  *
  *  Function to compute DI^t*J
  *  from the gradient of the image and the Jacobian
  *
  */
-void steepest_descent_images
+static void steepest_descent_images
 (
   double *Ix,  //x derivate of the image
   double *Iy,  //y derivate of the image
@@ -100,6 +99,33 @@ void steepest_descent_images
                    Iy[p*nz+c]*J[2*p*nparams+n+nparams];
 }
 
+/**
+ *
+ *  Function to compute the Hessian matrix
+ *  the Hessian is equal to G^t*G
+ *
+ */
+static void hessian
+(
+  double *G,   //the steepest descent image
+  double *H,   //output Hessian matrix
+  int nparams, //number of parameters
+  int nx,      //number of columns
+  int ny,      //number of rows
+  int nz       //number of channels
+)
+{
+  //initialize the hessian to zero
+  for(int k=0; k<nparams*nparams; k++)
+    H[k] = 0;
+
+  //calculate the hessian in a neighbor window
+  for(int p=0; p<nx*ny; p++) {
+        if ( std::isfinite(G[p*nz*nparams]) ) //Discarded if NAN
+          AtA(&(G[p*nz*nparams]), H, nz, nparams);
+  }
+}
+
 #ifdef PRECOMPUTATION_GTG
 /**
  *
@@ -107,7 +133,7 @@ void steepest_descent_images
  *  from G
  *
  */
-void precomputation_hessian
+static void precomputation_hessian
 (
   double *G,   //input G
   double *GTG, //output G^T G
@@ -131,19 +157,19 @@ void precomputation_hessian
  *  the Hessian is equal to rho'*(G^T G)
  *
  */
-void compute_hessian(
-  double *GTG,
-  double *rho,
-  double *H,
-  int nparams,
-  int nx,
-  int ny
+static void compute_hessian(
+  double *GTG, //precomputed matrix G^T G
+  double *rho, //robust weights
+  double *H,   //output Hessian matrix
+  int nparams, //number of parameters
+  int nx,      //number of rows
+  int ny       //number of columns
 )
 {
   //initialize the hessian to zero
   for(int k=0; k<nparams*nparams; k++)
     H[k] = 0;
-  
+
   //calculate the hessian in a neighbor window
   for(int p=0; p<nx*ny; p++) {
       //Discarded if NAN
@@ -151,46 +177,17 @@ void compute_hessian(
         sA(rho[p], &(GTG[p*nparams*nparams]), H, nparams);
   }
 }
-#endif
-
-/**
- *
- *  Function to compute the Hessian matrix
- *  the Hessian is equal to G^t*G
- *
- */
-void hessian
-(
-  double *G, //the steepest descent image
-  double *H,   //output Hessian matrix
-  int nparams, //number of parameters
-  int nx,      //number of columns
-  int ny,      //number of rows
-  int nz       //number of channels
-)
-{
-  //initialize the hessian to zero
-  for(int k=0; k<nparams*nparams; k++)
-    H[k] = 0;
-
-  //calculate the hessian in a neighbor window
-  for(int p=0; p<nx*ny; p++) {
-        if ( std::isfinite(G[p*nz*nparams]) ) //Discarded if NAN
-          AtA(&(G[p*nz*nparams]), H, nz, nparams);
-  }
-}
-
-
+#else
 /**
  *
  *  Function to compute the Hessian matrix with robust error functions
  *  the Hessian is equal to rho'*G^t*G
  *
  */
-void hessian
+static void hessian
 (
-  double *G, //the steepest descent image
-  double *rho, //robust function
+  double *G,   //the steepest descent image
+  double *rho, //robust weights
   double *H,   //output Hessian matrix
   int nparams, //number of parameters
   int nx,      //number of columns
@@ -209,14 +206,14 @@ void hessian
         sAtA(rho[p], &(G[p*nz*nparams]), H, nz, nparams);
   }
 }
-
+#endif
 
 /**
  *
  *  Function to compute the inverse of the Hessian
  *
  */
-void inverse_hessian
+static void inverse_hessian
 (
   double *H,   //input Hessian
   double *H_1, //output inverse Hessian
@@ -228,13 +225,12 @@ void inverse_hessian
     for(int i=0; i<nparams*nparams; i++) H_1[i]=0;
 }
 
-
 /**
  *
  *  Function to compute I2(W(x;p))-I1(x)
  *
  */
-void difference_image
+static void difference_image
 (
   double *I,  //second warped image I2(x'(x;p))
   double *Iw, //first image I1(x)
@@ -248,21 +244,20 @@ void difference_image
     DI[i]=Iw[i]-I[i];
 }
 
-
 /**
  *
  *  Function to store the values of p'((I2(x'(x;p))-I1(x))^2)
  *
  */
-void robust_error_function
+static void robust_error_function
 (
-  double *DI,   //input difference array
-  double *rho,  //output robust function
-  double lambda,//threshold used in the robust functions
-  int    type,  //choice of robust error function
-  int nx,       //number of columns
-  int ny,       //number of rows
-  int nz        //number of channels
+  double *DI,    //input difference array
+  double *rho,   //output robust weights
+  double lambda, //threshold used in the robust functions
+  int    type,   //choice of robust error function
+  int nx,        //number of columns
+  int ny,        //number of rows
+  int nz         //number of channels
 )
 {
     for(int p=0; p<nx*ny; p++) {
@@ -276,15 +271,14 @@ void robust_error_function
     }
 }
 
-
 /**
  *
  *  Function to compute b=Sum(G^t * DI)
  *
  */
-void independent_vector
+static void independent_vector
 (
-  double *G, //the steepest descent image
+  double *G,   //the steepest descent image
   double *DI,  //I2(x'(x;p))-I1(x)
   double *b,   //output independent vector
   int nparams, //number of parameters
@@ -297,13 +291,12 @@ void independent_vector
   for(int k=0; k<nparams; k++)
     b[k]=0;
 
-  for(int p=0; p<nx*ny; p++) { 
+  for(int p=0; p<nx*ny; p++) {
       //Discard if NAN
       if ( std::isfinite(G[p*nparams*nz]) && std::isfinite(DI[p*nz]) )
         Atb(&(G[p*nparams*nz]), &(DI[p*nz]), b, nz, nparams);
     }
 }
-
 
 /**
  *
@@ -311,9 +304,9 @@ void independent_vector
  *  with robust error functions
  *
  */
-void independent_vector
+static void independent_vector
 (
-  double *G, //the steepest descent image
+  double *G,   //the steepest descent image
   double *DI,  //I2(x'(x;p))-I1(x)
   double *rho, //robust function
   double *b,   //output independent vector
@@ -334,13 +327,12 @@ void independent_vector
    }
 }
 
-
 /**
  *
  *  Function to solve for dp
  *
  */
-double parametric_solve
+static double parametric_solve
 (
   double *H_1, //inverse Hessian
   double *b,   //independent vector
@@ -354,7 +346,6 @@ double parametric_solve
   return sqrt(error);
 }
 
-
 /**
   *
   *  Inverse compositional algorithm
@@ -363,18 +354,18 @@ double parametric_solve
   *
 **/
 void inverse_compositional_algorithm(
-  double *I1,   //first image
-  double *I2,   //second image
-  double *p,    //parameters of the transform (output)
-  int nparams,  //number of parameters of the transform
-  int nx,       //number of columns of the image
-  int ny,       //number of rows of the image
-  int nz,       //number of channels of the images
-  double TOL,   //Tolerance used for the convergence in the iterations
-  int nanifoutside,
-  int delta,
-  int type_gradient,
-  int verbose   //enable verbose mode
+  double *I1,        //first image
+  double *I2,        //second image
+  double *p,         //parameters of the transform (output)
+  int nparams,       //number of parameters of the transform
+  int nx,            //number of columns of the image
+  int ny,            //number of rows of the image
+  int nz,            //number of channels of the images
+  double TOL,        //Tolerance used for the convergence in the iterations
+  int nanifoutside,  //parameter for discarding boundary pixels
+  int delta,         //distance to the boundary
+  int type_gradient, //type of gradient
+  int verbose        //enable verbose mode
 )
 {
   int size1=nx*ny*nz;        //size of the image with channels
@@ -410,7 +401,7 @@ void inverse_compositional_algorithm(
         }
     }
   }
-  
+
   //Prefiltering of the images before the loop
   if ( type_gradient ) {
     prefiltering_robust(I1, nx, ny, nz, type_gradient);
@@ -426,7 +417,7 @@ void inverse_compositional_algorithm(
   //Compute the Hessian matrix
   hessian(G, H, nparams, nx, ny, nz);
   inverse_hessian(H, H_1, nparams);
-  
+
   //delete allocated memory
   delete []Ix;
   delete []Iy;
@@ -437,7 +428,7 @@ void inverse_compositional_algorithm(
   double *DI =new double[size1];   //error image (I2(w)-I1)
   double *dp =new double[nparams]; //incremental solution
   double *b  =new double[nparams]; //steepest descent images
-  
+
   //Iterate
   double error=1E10;
   int niter=0;
@@ -478,8 +469,6 @@ void inverse_compositional_algorithm(
   delete []H_1;
 }
 
-
-
 /**
   *
   *  Inverse compositional algorithm
@@ -487,20 +476,20 @@ void inverse_compositional_algorithm(
   *
 **/
 void robust_inverse_compositional_algorithm(
-  double *I1,    //first image
-  double *I2,    //second image
-  double *p,     //parameters of the transform (output)
-  int nparams,   //number of parameters of the transform
-  int nx,        //number of columns of the image
-  int ny,        //number of rows of the image
-  int nz,        //number of channels of the images
-  double TOL,    //Tolerance used for the convergence in the iterations
-  int    robust, //robust error function
-  double lambda, //parameter of robust error function
-  int nanifoutside,
-  int delta,
-  int type_gradient,
-  int verbose    //enable verbose mode
+  double *I1,        //first image
+  double *I2,        //second image
+  double *p,         //parameters of the transform (output)
+  int nparams,       //number of parameters of the transform
+  int nx,            //number of columns of the image
+  int ny,            //number of rows of the image
+  int nz,            //number of channels of the images
+  double TOL,        //Tolerance used for the convergence in the iterations
+  int    robust,     //robust error function
+  double lambda,     //parameter of robust error function
+  int nanifoutside,  //parameter for discarding boundary pixels
+  int delta,         //distance to the boundary
+  int type_gradient, //type of gradient
+  int verbose        //enable verbose mode
 )
 {
   int size0=nx*ny;           //size of the image
@@ -536,13 +525,13 @@ void robust_inverse_compositional_algorithm(
         }
     }
   }
-  
+
   //Prefiltering of the images before the loop
   if ( type_gradient ) {
     prefiltering_robust(I1, nx, ny, nz, type_gradient);
     prefiltering_robust(I2, nx, ny, nz, type_gradient);
   }
-  
+
   //Evaluate the Jacobian
   jacobian(J, nparams, nx, ny);
 
@@ -554,12 +543,12 @@ void robust_inverse_compositional_algorithm(
     double *GTG=new double[size5];   //G^T G
     precomputation_hessian(G, GTG, nparams, nx, ny, nz);
   #endif
-  
+
   //delete allocated memory
   delete []Ix;
   delete []Iy;
   delete []J;
-  
+
   //memory allocation for the iteration
   double *Iw =new double[size1];   //warp of the second image/
   double *DI =new double[size1];   //error image (I2(w)-I1)
@@ -568,7 +557,7 @@ void robust_inverse_compositional_algorithm(
   double *H  =new double[size3];   //Hessian matrix
   double *H_1=new double[size3];   //inverse Hessian matrix
   double *rho=new double[size0];   //robust function
-  
+
   //Iterate
   double error=1E10;
   int niter=0;
@@ -635,30 +624,29 @@ void robust_inverse_compositional_algorithm(
   #endif
 }
 
-
 /**
   *
   *  Multiscale approach for computing the optical flow
   *
 **/
 void pyramidal_inverse_compositional_algorithm(
-    double *I1,     //first image
-    double *I2,     //second image
-    double *p,      //parameters of the transform
-    int    nparams, //number of parameters
-    int    nxx,     //image width
-    int    nyy,     //image height
-    int    nzz,     //number of color channels in image
-    int    nscales, //number of scales
-    double nu,      //downsampling factor
-    double TOL,     //stopping criterion threshold
-    int    robust,  //robust error function
-    double lambda,  //parameter of robust error function
-    int first_scale,
-    int nanifoutside,
-    int delta,
-    int type_gradient,
-    bool   verbose //switch on messages
+    double *I1,        //first image
+    double *I2,        //second image
+    double *p,         //parameters of the transform
+    int nparams,       //number of parameters
+    int nxx,           //image width
+    int nyy,           //image height
+    int nzz,           //number of color channels in image
+    int nscales,       //number of scales
+    double nu,         //downsampling factor
+    double TOL,        //stopping criterion threshold
+    int robust,        //robust error function
+    double lambda,     //parameter of robust error function
+    int first_scale,   //number of the first scale
+    int nanifoutside,  //parameter for discarding boundary pixels
+    int delta,         //distance to the boundary
+    int type_gradient, //type of gradient
+    bool   verbose     //switch on messages
 )
 {
     int size=nxx*nyy*nzz;
@@ -684,10 +672,6 @@ void pyramidal_inverse_compositional_algorithm(
     nx[0]=nxx;
     ny[0]=nyy;
 
-    //initialization of the transformation parameters at the finest scale
-//     for(int i=0; i<nparams; i++)
-//       p[i]=0.0;
-
     //create the scales
     for(int s=1; s<nscales; s++)
     {
@@ -699,24 +683,21 @@ void pyramidal_inverse_compositional_algorithm(
       I2s[s]=new double[size*nzz];
       ps[s] =new double[nparams];
 
-//       for(int i=0; i<nparams; i++)
-//         ps[s][i]=0.0;
-
       //zoom the images from the previous scale
       zoom_out(I1s[s-1], I1s[s], nx[s-1], ny[s-1], nzz, nu);
       zoom_out(I2s[s-1], I2s[s], nx[s-1], ny[s-1], nzz, nu);
     }
 
-    //delete allocated memory for unused scales 
+    //delete allocated memory for unused scales
     for (int i=0; i<first_scale; i++) {
         delete []I1s[i];
         delete []I2s[i];
     }
-    
+
     //initialization of the transformation parameters at the coarsest scale
     for(int i=0; i<nparams; i++)
         ps[nscales-1][i]=0.0;
-    
+
     //pyramidal approach for computing the transformation
     for(int s=nscales-1; s>= first_scale; s--)
     {
@@ -747,10 +728,10 @@ void pyramidal_inverse_compositional_algorithm(
           ps[s], ps[s-1], nparams, nx[s], ny[s], nx[s-1], ny[s-1]);
         delete []ps [s];
       }
-      
+
       //delete allocated memory
       delete []I1s[s];
-      delete []I2s[s];  
+      delete []I2s[s];
     }
 
     //Upsample the parameters

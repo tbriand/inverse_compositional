@@ -1,12 +1,12 @@
-CFLAGS=-Wall -Wextra  -O3 #-Werror
-LFLAGS=-lm -lpng -ljpeg -ltiff -fopenmp
+CFLAGS=-Wall -Wextra -O3 -Werror
+LFLAGS=-lm -lpng -ljpeg -ltiff
 
 
 # Recursively get all *.cpp and *.c in this directory and any sub-directories
-SRC1 := $(shell find . -name "*.cpp") 
-SRC2 := $(shell find . -name "*.c") 
+SRC1 := $(shell find . -name "*.cpp")
+SRC2 := $(shell find . -name "*.c")
 
-INCLUDE = -I. -I./feature_based_motion
+INCLUDE = -I.
 
 #Replace suffix .cpp and .c by .o
 OBJ := $(addsuffix .o,$(basename $(SRC1))) $(addsuffix .o,$(basename $(SRC2)))
@@ -19,7 +19,7 @@ OBJBIN = ./noise.o ./output.o ./main.o
 OBJ1 := $(filter-out $(OBJBIN),$(OBJ))
 
 #All is the target (you would run make all from the command line). 'all' is dependent
-all: $(BIN) 
+all: $(BIN)
 
 #Generate executables
 main: $(OBJ1) main.o
@@ -37,7 +37,7 @@ output: output.o file.o iio.o bicubic_interpolation.o inverse_compositional_algo
 	gcc -std=c99  -c $< -o $@ $(INCLUDE) $(CFLAGS) $(LFLAGS)  -Wno-unused -pedantic -DNDEBUG -D_GNU_SOURCE
 
 %.o: %.cpp
-	g++ -std=c++11 -c $< -o $@ $(INCLUDE) $(CFLAGS) $(LFLAGS) 
+	g++ -std=c++11 -c $< -o $@ $(INCLUDE) $(CFLAGS) $(LFLAGS)
 
-clean: 
+clean:
 	rm -f $(OBJ) $(DEST)

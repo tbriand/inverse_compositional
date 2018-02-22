@@ -48,12 +48,12 @@ add_noise $ref $ref_noisy $std
 add_noise $warped $warped_noisy $std
 
 echo ""
-inverse_compositional_algorithm $ref_noisy $warped_noisy -f $filewithout -z $zoom -n $nscales -r $robust -e $eps -t $transform -s 0 -c 0 -d 0 -p 0 -g 0 > /dev/null
-inverse_compositional_algorithm $ref_noisy $warped_noisy -f $file -z $zoom -n $nscales -r $robust -e $eps -t $transform -s $first_scale -c $GRAYMETHOD -d $edgepadding -p $NANIFOUTSIDE -g $gradient -v
+GRAYMETHOD=0 EDGEPADDING=0 NANIFOUTSIDE=0 ROBUST_GRADIENT=0 inverse_compositional_algorithm $ref_noisy $warped_noisy -f $filewithout -z $zoom -n $nscales -r $robust -e $eps -t $transform -s 0 > /dev/null
+GRAYMETHOD=$GRAYMETHOD EDGEPADDING=$edgepadding NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$gradient inverse_compositional_algorithm $ref_noisy $warped_noisy -f $file -z $zoom -n $nscales -r $robust -e $eps -t $transform -s $first_scale -v
 
 echo ""
 echo "Without modification:"
-generate_output $ref_noisy $warped_noisy $filewithout $file2
+NANIFOUTSIDE=1 EDGEPADDING=0 generate_output $ref_noisy $warped_noisy $filewithout $file2
 mv output_estimated.png output_estimated2.png
 if [ -f epe.png ]; then
     mv epe.png epe2.png
@@ -62,4 +62,4 @@ mv diff_image.png diff_image2.png
 
 echo ""
 echo "With modifications:"
-generate_output $ref_noisy $warped_noisy $file $file2
+NANIFOUTSIDE=1 EDGEPADDING=0 generate_output $ref_noisy $warped_noisy $file $file2

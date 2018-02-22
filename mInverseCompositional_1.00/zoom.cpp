@@ -3,6 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // Copyright (C) 2014, Nelson Monzón López <nmonzon@ctim.es>
 // All rights reserved.
@@ -22,10 +23,10 @@
   * Compute the size of a zoomed image from the zoom factor
   *
 **/
-void zoom_size 
+void zoom_size
 (
   int nx,       //width of the orignal image
-  int ny,       //height of the orignal image          
+  int ny,       //height of the orignal image
   int &nxx,     //width of the zoomed image
   int &nyy,     //height of the zoomed image
   double factor //zoom factor between 0 and 1
@@ -46,26 +47,26 @@ void zoom_out
   double *Iout, //output image
   int nx,       //image width
   int ny,       //image height
-  int nz,       // number of color channels in image              
+  int nz,       // number of color channels in image
   double factor //zoom factor between 0 and 1
 )
 {
   int nxx, nyy, original_size =nx*ny*nz;
   double ifactor = 1.0/factor;
   double *Is=new double[original_size];
-  
+
   for (int i=0; i<original_size; i++)
     Is[i]=I[i];
 
   //calculate the size of the zoomed image
   zoom_size(nx, ny, nxx, nyy, factor);
-  
+
   //compute the Gaussian sigma for smoothing
   double sigma=ZOOM_SIGMA_ZERO*sqrt(ifactor*ifactor-1.0);
 
   //pre-smooth the image
   gaussian(Is, nx, ny, nz, sigma);
-  
+
   if ( (int) ifactor == ifactor) {
       for (int i1=0; i1<nyy; i1++)
         for (int j1=0; j1<nxx; j1++)
@@ -73,11 +74,11 @@ void zoom_out
             int i2= i1*ifactor;
             int j2= j1*ifactor;
             for(int index_color=0; index_color<nz; index_color++)
-            Iout[(i1*nxx+j1)*nz+index_color]=Is[(i2*nx+j2)*nz+index_color];  
+            Iout[(i1*nxx+j1)*nz+index_color]=Is[(i2*nx+j2)*nz+index_color];
         }
     }
     else {
-    // re-sample the image using bicubic interpolation 
+    // re-sample the image using bicubic interpolation
         for (int i1=0; i1<nyy; i1++)
         for (int j1=0; j1<nxx; j1++)
         {
@@ -85,10 +86,10 @@ void zoom_out
             double j2=(double)j1*ifactor;
             for(int index_color=0; index_color<nz; index_color++)
             Iout[(i1*nxx+j1)*nz+index_color]=
-            bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);  
-        }  
+            bicubic_interpolation(Is, j2, i2, nx, ny, nz, index_color);
+        }
     }
-  
+
   delete []Is;
 }
 
@@ -97,10 +98,10 @@ void zoom_out
   * Function to upsample the parameters of the transformation
   *
 **/
-void zoom_in_parameters 
+void zoom_in_parameters
 (
   double *p,    //input parameters
-  double *pout, //output parameters   
+  double *pout, //output parameters
   int nparams,  //number of parameters
   int nx,       //width of the original image
   int ny,       //height of the original image
@@ -114,7 +115,7 @@ void zoom_in_parameters
   double nu=(factorx>factory)?factorx:factory;
 
   switch(nparams) {
-    default: case TRANSLATION_TRANSFORM: //p=(tx, ty) 
+    default: case TRANSLATION_TRANSFORM: //p=(tx, ty)
       pout[0]=p[0]*nu;
       pout[1]=p[1]*nu;
       break;

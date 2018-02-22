@@ -3,10 +3,9 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
-// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@ulpgc.es>
 // All rights reserved.
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +21,7 @@ extern "C"
  *  Functions to read images using the iio library
  *  It allocates memory for the image and returns true if it
  *  correctly reads the image
- * 
+ *
  */
 bool read_image
 (
@@ -85,7 +84,7 @@ void save_normalize_image
     if(f[i]<min)min=f[i];
     if(f[i]>max)max=f[i];
   }
-  
+
   float *ff=new float[nx*ny*nz];
   for(int i=0;i<nx*ny*nz;i++) ff[i]=255.0;
   if(max>min)
@@ -119,9 +118,9 @@ void save_flow
   double *v,  //y component of the optical flow
   int nx,     //number of columns
   int ny      //number of rows
-) 
+)
 {
-  //save the flow 
+  //save the flow
   float *f=new float[nx*ny*2];
   for (int i=0; i<nx*ny; i++)
     {
@@ -144,8 +143,8 @@ void read
   char *file,   //input file name
   double **p,   //parameters to be read
   int &nparams, //number of parameters
-  int &nx,      //number of columns 
-  int &ny       //number of rows 
+  int &nx,      //number of columns
+  int &ny       //number of rows
 )
 {
   FILE *fd=fopen(file,"r");
@@ -165,7 +164,6 @@ void read
   }
 }
 
-
 /**
  *
  *  Function to save the parameters in ascii format
@@ -175,14 +173,14 @@ void read
  */
 void save
 (
-  char *file,  //output file name 
+  char *file,  //output file name
   double *p,   //parameters to be saved
   int nparams, //number of parameters
-  int nx,      //number of columns 
-  int ny       //number of rows 
-) 
+  int nx,      //number of columns
+  int ny       //number of rows
+)
 {
-  
+
   FILE *fd=fopen(file,"w");
   fprintf(fd,"%d %d %d\n", nparams, nx, ny);
   for(int i=0; i<nx*ny; i++)
@@ -194,12 +192,11 @@ void save
   fclose(fd);
 }
 
-
 /**
  *
  *  Function to read the parameters in ascii format
  *  It reads a header with: nparams
- *  Then it reads the parameters 
+ *  Then it reads the parameters
  *
  */
 void read
@@ -236,7 +233,7 @@ void save
   const char *file, //output file name
   double *p,        //parameters to be saved
   int nparams       //number of parameters
-) 
+)
 {
   FILE *fd=fopen(file,"w");
   fprintf(fd,"%d\n", nparams);

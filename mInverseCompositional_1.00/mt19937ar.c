@@ -149,3 +149,4 @@ void mt_init_genrand(unsigned long s) {
 double mt_genrand_res53(void) {
     return genrand_res53();
 }
+

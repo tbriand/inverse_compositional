@@ -3,7 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
-// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
@@ -55,7 +55,7 @@ void print_help(char *name)
   printf(" -e F    \t Threshold for the convergence criterion \n");
   printf("         \t   Default value %0.4f\n", PAR_DEFAULT_TOL);
   printf(" -t N    \t Transformation type to be computed:\n");
-  printf("         \t   2-traslation; 3-Euclidean transform; 4-similarity\n");
+  printf("         \t   2-translation; 3-Euclidean transform; 4-similarity\n");
   printf("         \t   6-affinity; 8-homography\n");
   printf("         \t   Default value %d\n",
                         PAR_DEFAULT_TYPE);
@@ -85,7 +85,6 @@ void print_help(char *name)
                         PAR_DEFAULT_TYPE_GRADIENT);
   printf(" -v      \t Switch on verbose mode. \n\n\n");
 }
-
 
 /**
  *
@@ -123,17 +122,17 @@ int read_parameters(
 
     //assign default values to the parameters
     strcpy(outfile,PAR_DEFAULT_OUTFILE);
-    nscales    =PAR_DEFAULT_NSCALES;
-    zfactor    =PAR_DEFAULT_ZFACTOR;
-    TOL        =PAR_DEFAULT_TOL;
-    nparams    =PAR_DEFAULT_TYPE;
-    robust     =PAR_DEFAULT_ROBUST;
-    lambda     =PAR_DEFAULT_LAMBDA;
-    verbose    =PAR_DEFAULT_VERBOSE;
-    first_scale=PAR_DEFAULT_FIRST_SCALE;
-    graymethod =PAR_DEFAULT_GRAYMETHOD;
-    delta      =PAR_DEFAULT_DELTA;
-    nanifoutside=PAR_DEFAULT_NANIFOUTSIDE;
+    nscales      =PAR_DEFAULT_NSCALES;
+    zfactor      =PAR_DEFAULT_ZFACTOR;
+    TOL          =PAR_DEFAULT_TOL;
+    nparams      =PAR_DEFAULT_TYPE;
+    robust       =PAR_DEFAULT_ROBUST;
+    lambda       =PAR_DEFAULT_LAMBDA;
+    verbose      =PAR_DEFAULT_VERBOSE;
+    first_scale  =PAR_DEFAULT_FIRST_SCALE;
+    graymethod   =PAR_DEFAULT_GRAYMETHOD;
+    delta        =PAR_DEFAULT_DELTA;
+    nanifoutside =PAR_DEFAULT_NANIFOUTSIDE;
     type_gradient=PAR_DEFAULT_TYPE_GRADIENT;
 
     //read each parameter from the command line
@@ -170,19 +169,19 @@ int read_parameters(
       if(strcmp(argv[i],"-s")==0)
         if(i<argc-1)
           first_scale=atoi(argv[++i]);
-      
+
       if(strcmp(argv[i],"-c")==0)
         if(i<argc-1)
           graymethod=atoi(argv[++i]);
-      
+
       if(strcmp(argv[i],"-d")==0)
         if(i<argc-1)
           delta=atoi(argv[++i]);
-        
+
       if(strcmp(argv[i],"-p")==0)
         if(i<argc-1)
           nanifoutside=atoi(argv[++i]);
-    
+
       if(strcmp(argv[i],"-g")==0)
         if(i<argc-1)
           type_gradient=atoi(argv[++i]);
@@ -194,17 +193,24 @@ int read_parameters(
     }
 
     //check parameter values
-    //if(nscales <= 0)           nscales=PAR_DEFAULT_NSCALES;
-    if(zfactor<=0||zfactor>=1) zfactor=PAR_DEFAULT_ZFACTOR;
-    if(TOL<0)                  TOL    =PAR_DEFAULT_TOL;
-    if(nparams!=2 && nparams!=3 && nparams!=4 &&
-     nparams!=6 && nparams!=8) nparams=PAR_DEFAULT_TYPE;
-    if(robust<0||robust>4)     robust =PAR_DEFAULT_ROBUST;
-    if(lambda<0)               lambda =PAR_DEFAULT_LAMBDA;
-    if(delta<0)                delta  =PAR_DEFAULT_DELTA;
-    if(nanifoutside != 0 && nanifoutside != 1) nanifoutside=PAR_DEFAULT_NANIFOUTSIDE;
-    if(graymethod != 0 && graymethod != 1) graymethod=PAR_DEFAULT_GRAYMETHOD;
-    if(type_gradient<0 || type_gradient>5) type_gradient =PAR_DEFAULT_TYPE_GRADIENT;
+    if(zfactor<=0||zfactor>=1)
+        zfactor=PAR_DEFAULT_ZFACTOR;
+    if(TOL<0)
+        TOL=PAR_DEFAULT_TOL;
+    if(nparams!=2 && nparams!=3 && nparams!=4 && nparams!=6 && nparams!=8)
+        nparams=PAR_DEFAULT_TYPE;
+    if(robust<0||robust>4)
+        robust=PAR_DEFAULT_ROBUST;
+    if(lambda<0)
+        lambda=PAR_DEFAULT_LAMBDA;
+    if(delta<0)
+        delta=PAR_DEFAULT_DELTA;
+    if(nanifoutside != 0 && nanifoutside != 1)
+        nanifoutside=PAR_DEFAULT_NANIFOUTSIDE;
+    if(graymethod != 0 && graymethod != 1)
+        graymethod=PAR_DEFAULT_GRAYMETHOD;
+    if(type_gradient<0 || type_gradient>5)
+        type_gradient=PAR_DEFAULT_TYPE_GRADIENT;
   }
 
   return 1;
@@ -237,32 +243,40 @@ void rgb2gray(
  *  Main program:
  *   This program reads the following parameters from the console and
  *   computes the corresponding parametric transformation:
- *   -I1          first image
- *   -I2          second image
- *   -out_file    name of the output flow field
- *   -nscales     number of scales for the pyramidal approach
- *   -zoom_factor reduction factor for creating the scales
- *   -TOL         stopping criterion threshold for the iterative process
- *   -robust      type of the robust error function
- *   -lambda      parameter of the robust error function
- *   -type        type of the parametric model (the number of parameters):
- *                Translation(2), Euclidean(3), Similarity(4), Affinity(6),
- *                Homography(8)
- *   -first_scale first scale used in the pyramid
- *   -verbose     switch on/off messages
+ *   -I1            first image
+ *   -I2            second image
+ *   -outfile       name of the output flow field
+ *   -nscales       number of scales for the pyramidal approach
+ *   -zoom_factor   reduction factor for creating the scales
+ *   -TOL           stopping criterion threshold for the iterative process
+ *   -type          type of the parametric model (the number of parameters):
+ *                  Translation(2), Euclidean(3), Similarity(4), Affinity(6),
+ *                  Homography(8)
+ *   -robust        type of the robust error function
+ *   -lambda        parameter of the robust error function
+ *   -first_scale   first scale used in the pyramid
+ *   -graymethod    parameter for grayscale conversion
+ *   -delta         distance to the boundary
+ *   -nanifoutside  parameter for discarding boundary pixels
+ *   -type_gradient type of gradient:
+ *                  0-Central differences; 1-Hypomode
+ *                  2-Farid 3x3; 3-Farid 5x5; 4-Sigma 3; 5-Sigma 6
+ *   -verbose       switch on/off messages
  *
  */
 int main (int argc, char *argv[])
 {
   //parameters of the method
   char  *image1, *image2, outfile[200];
-  int    nscales, nparams, robust, verbose, first_scale, graymethod, delta, nanifoutside, type_gradient;
+  int    nscales, nparams, robust, verbose, first_scale, graymethod;
+  int    delta, nanifoutside, type_gradient;
   double zfactor, TOL, lambda;
 
   //read the parameters from the console
   int result=read_parameters(
         argc, argv, &image1, &image2, outfile, nscales,
-        zfactor, TOL, nparams, robust, lambda, verbose, first_scale, graymethod, delta, nanifoutside, type_gradient
+        zfactor, TOL, nparams, robust, lambda, verbose, first_scale,
+        graymethod, delta, nanifoutside, type_gradient
       );
 
   if(result)
@@ -281,12 +295,14 @@ int main (int argc, char *argv[])
       //limit the number of scales according to image size (min 32x32)
       int N=1+log(std::min(nx, ny)/32.)/log(1./zfactor);
       if (N<nscales || nscales <= 0) nscales= N;
-      
+
       if(verbose)
         printf(
           "\nParameters: scales=%d, zoom=%f, TOL=%f, transform type=%d, "
-          "robust function=%d, lambda=%f, output file=%s, delta=%d, nanifoutside=%d, graymethod=%d, first scale=%d, gradient type=%d\n",
-          nscales, zfactor, TOL, nparams, robust, lambda, outfile, delta, nanifoutside, graymethod, first_scale, type_gradient
+          "robust function=%d, lambda=%f, output file=%s, delta=%d, "
+          "nanifoutside=%d, graymethod=%d, first scale=%d, gradient type=%d\n",
+          nscales, zfactor, TOL, nparams, robust, lambda, outfile, delta,
+          nanifoutside, graymethod, first_scale, type_gradient
         );
 
       //allocate memory for the parametric model
@@ -308,7 +324,8 @@ int main (int argc, char *argv[])
         const clock_t begin = clock();
         pyramidal_inverse_compositional_algorithm(
            I1g, I2g, p, nparams, nx, ny, 1,
-        nscales, zfactor, TOL, robust, lambda, first_scale, nanifoutside, delta, type_gradient, verbose
+           nscales, zfactor, TOL, robust, lambda, first_scale, nanifoutside,
+           delta, type_gradient, verbose
         );
 
         if(verbose)
@@ -323,7 +340,8 @@ int main (int argc, char *argv[])
         const clock_t begin = clock();
         pyramidal_inverse_compositional_algorithm(
            I1, I2, p, nparams, nx, ny, nz,
-        nscales, zfactor, TOL, robust, lambda, first_scale, nanifoutside, delta, type_gradient, verbose
+           nscales, zfactor, TOL, robust, lambda, first_scale, nanifoutside,
+           delta, type_gradient, verbose
         );
 
         if(verbose)

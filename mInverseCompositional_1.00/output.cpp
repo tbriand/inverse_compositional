@@ -3,6 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
@@ -14,7 +15,6 @@
 #include "file.h"
 #include "inverse_compositional_algorithm.h"
 #include "transformation.h"
-
 
 /*********************************************************************
  * NOTE:                                                             *
@@ -48,7 +48,6 @@ double distance(
   double d=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2);
   return sqrt(d);
 }
-
 
 /**
  *
@@ -131,10 +130,12 @@ void print_output(
     printf("EPE=-N/A-\n");
 
   //writing matrices
-  printf("Computed transform=%0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg\n",
+  printf("Computed transform=%0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg "
+         "%0.14lg %0.14lg %0.14lg\n",
          m1[0],m1[1],m1[2],m1[3],m1[4],m1[5],m1[6],m1[7],m1[8]);
   if(p2!=NULL)
-    printf("Original transform=%0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg\n",
+    printf("Original transform=%0.14lg %0.14lg %0.14lg %0.14lg %0.14lg %0.14lg "
+           "%0.14lg %0.14lg %0.14lg\n",
            m2[0],m2[1],m2[2],m2[3],m2[4],m2[5],m2[6],m2[7],m2[8]);
   else
     printf("Original transform=- - - - - - - - -\n");
@@ -144,7 +145,6 @@ void print_output(
   delete []EPE;
   delete []DIrmse;
 }
-
 
 int main(int c, char *v[])
 {

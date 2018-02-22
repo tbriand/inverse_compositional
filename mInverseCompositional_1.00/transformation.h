@@ -3,11 +3,9 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
-
-// July 2017
-// File modified by Thibaud Briand <thibaud.briand@enpc.fr>
 
 #ifndef TRANSFORMATION_H
 #define TRANSFORMATION_H
@@ -18,7 +16,6 @@
 #define SIMILARITY_TRANSFORM  4
 #define AFFINITY_TRANSFORM    6
 #define HOMOGRAPHY_TRANSFORM  8
-
 
 /**
  *
@@ -48,7 +45,6 @@ void update_transform
   int nparams //number of parameters
 );
 
-
 /**
  *
  *  Function to transform a 2D point (x,y) through a parametric model
@@ -63,7 +59,6 @@ void project
   double &yp, //y component of the transformed point
   int nparams //number of parameters
 );
-
 
 /**
  *
