@@ -60,7 +60,7 @@ void print_help(char *name)
                         PAR_DEFAULT_TYPE);
   printf(" -r N    \t Use robust error functions: \n");
   printf("         \t   0-Non robust (L2 norm); 1-truncated quadratic\n");
-  printf("         \t   2-German & McLure; 3-Lorentzian 4-Charbonnier \n");
+  printf("         \t   2-Geman & McLure; 3-Lorentzian 4-Charbonnier \n");
   printf("         \t   Default value %d\n",
                         PAR_DEFAULT_ROBUST);
   printf(" -l F    \t Value of the parameter for the robust error function\n");

@@ -30,7 +30,7 @@
 
 #define QUADRATIC 0
 #define TRUNCATED_QUADRATIC 1
-#define GERMAN_MCCLURE 2
+#define GEMAN_MCCLURE 2
 #define LORENTZIAN 3
 #define CHARBONNIER 4
 

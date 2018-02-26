@@ -99,7 +99,7 @@ accompanying IPOL article. Usage instructions:
 		           Default value 8
 	 -r N            Use robust error functions:
 		           0-Non robust (L2 norm); 1-truncated quadratic
-		           2-German & McLure; 3-Lorentzian 4-Charbonnier
+		           2-Geman & McLure; 3-Lorentzian 4-Charbonnier
 		           Default value 3
 	 -l F            Value of the parameter for the robust error function
 		           A value <=0 if it is automatically computed

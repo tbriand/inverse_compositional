@@ -94,12 +94,12 @@ accompanying IPOL article. Usage instructions:
    -e F     Threshold for the convergence criterion 
               
    -t N     Transformation type to be computed:
-              2-traslation; 3-Euclidean transform; 4-similarity
+              2-translation; 3-Euclidean transform; 4-similarity
               6-affinity; 8-homography 
               
    -r N     Use robust error functions: 
               0-Non robust (L2 norm); 1-truncated quadratic 
-              2-German & McLure; 3-Lorentzian 4-Charbonnier 
+              2-Geman & McLure; 3-Lorentzian 4-Charbonnier 
               
    -l F     Value of the parameter for the robust error function
               A value <=0 if it is automatically computed

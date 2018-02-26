@@ -59,7 +59,7 @@ double rhop(
       if(t2<lambda2) result=1.0;
       else result=0.0;
       break;
-    case GERMAN_MCCLURE:
+    case GEMAN_MCCLURE:
       result=lambda2/((lambda2+t2)*(lambda2+t2));
       break;
     case LORENTZIAN:
