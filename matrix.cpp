@@ -3,7 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
-// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
@@ -18,9 +18,9 @@ void Axb(double *A, double *b, double *p, int n)
     double sum=0;
     for(int j=0; j<n; j++)
       sum+=A[i*n+j]*b[j];
-    
+
     p[i]=sum;
-  }   
+  }
 }
 
 //Multiplication of the transpose of a matrix and a vector
@@ -29,7 +29,7 @@ void Atb(double *A, double *b, double *p, int n, int m)
 {
   for(int i=0; i<m; i++) {
     double sum = 0;
-    for(int j=0; j<n; j++) 
+    for(int j=0; j<n; j++)
       sum +=A[j*m+i]*b[j];
     p[i] += sum;
   }
@@ -40,7 +40,7 @@ void Atb(double *A, double *b, double *p, int n, int m)
 void sAtb(double s, double *A, double *b, double *p, int n, int m)
 {
   for(int i=0; i<m; i++) {
-    double sum = 0;  
+    double sum = 0;
     for(int j=0; j<n; j++)
       sum += A[j*m+i]*b[j];
     p[i] += s*sum;
@@ -87,7 +87,7 @@ int inverse(
   double *A,   //input matrix
   double *A_1, //output matrix
   int N        //matrix dimension
-) 
+)
 {
   double *PASO=new double[2*N*N];
 
@@ -99,20 +99,20 @@ int inverse(
       PASO[i*2*N+j]=A[i*N+j];
       PASO[i*2*N+j+N]=0.;
     }
-  }    
+  }
   for(i=0;i<N;i++)
-      PASO[i*2*N+i+N]=1.;      
-      
+      PASO[i*2*N+i+N]=1.;
+
   for(i=0;i<N;i++){
     max=fabs(PASO[i*2*N+i]);
     i_max=i;
     for(j=i;j<N;j++){
        if(fabs(PASO[j*2*N+i])>max){
          i_max=j; max=fabs(PASO[j*2*N+i]);
-       } 
+       }
     }
 
-    if(max<10e-30){ 
+    if(max<10e-30){
       delete []PASO;
       return -1;
     }
@@ -122,34 +122,34 @@ int inverse(
         PASO[i*2*N+k]=PASO[i_max*2*N+k];
         PASO[i_max*2*N+k]=paso;
       }
-    } 
+    }
 
     for(j=i+1;j<N;j++){
       mul=-PASO[j*2*N+i]/PASO[i*2*N+i];
-      for(k=i;k<2*N;k++) PASO[j*2*N+k]+=mul*PASO[i*2*N+k];                
+      for(k=i;k<2*N;k++) PASO[j*2*N+k]+=mul*PASO[i*2*N+k];
     }
   }
-  
-  if(fabs(PASO[(N-1)*2*N+N-1])<10e-30){ 
+
+  if(fabs(PASO[(N-1)*2*N+N-1])<10e-30){
       delete []PASO;
       return -1;
   }
-      
+
   for(i=N-1;i>0;i--){
     for(j=i-1;j>=0;j--){
       mul=-PASO[j*2*N+i]/PASO[i*2*N+i];
-      for(k=i;k<2*N;k++) PASO[j*2*N+k]+=mul*PASO[i*2*N+k];     
+      for(k=i;k<2*N;k++) PASO[j*2*N+k]+=mul*PASO[i*2*N+k];
     }
-  }  
+  }
   for(i=0;i<N;i++)
     for(j=N;j<2*N;j++)
-      PASO[i*2*N+j]/=PASO[i*2*N+i];  
-    
+      PASO[i*2*N+j]/=PASO[i*2*N+i];
+
   for(i=0;i<N;i++)
     for(j=0;j<N;j++)
       A_1[i*N+j]=PASO[i*2*N+j+N];
 
   delete []PASO;
-  
-  return 0;   
+
+  return 0;
 }

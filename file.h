@@ -3,9 +3,9 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@ulpgc.es>
 // All rights reserved.
-
 
 #ifndef FILE_H
 #define FILE_H
@@ -15,7 +15,7 @@
  *  Functions to read images using the iio library
  *  It allocates memory for the image and returns true if it
  *  correctly reads the image
- * 
+ *
  */
 bool read_image
 (
@@ -95,8 +95,8 @@ void read
   char *file,   //input file name
   double **p,   //parameters to be read
   int &nparams, //number of parameters
-  int &nx,      //number of columns 
-  int &ny       //number of rows 
+  int &nx,      //number of columns
+  int &ny       //number of rows
 );
 
 /**
@@ -108,18 +108,18 @@ void read
  */
 void save
 (
-  char *file,  //output file name 
+  char *file,  //output file name
   double *p,   //parameters to be saved
   int nparams, //number of parameters
-  int nx,      //number of columns 
-  int ny       //number of rows 
+  int nx,      //number of columns
+  int ny       //number of rows
 );
 
 /**
  *
  *  Function to read the parameters in ascii format
  *  It reads a header with: nparams nx ny
- *  Then it reads the parameters 
+ *  Then it reads the parameters
  *
  */
 void read
@@ -129,17 +129,28 @@ void read
   int &nparams      //number of parameters
 );
 
-
 /**
  *
  *  Function to save the parameters in ascii format
  *  It creates a header with: nparams nx ny
- *  Then it stores the parameters 
+ *  Then it stores the parameters
  *
  */
 void save
 (
-  const char *file, //output file name 
+  const char *file, //output file name
+  double *p,        //parameters to be saved
+  int nparams       //number of parameters
+);
+
+/**
+ *
+ *  Function to save the parameters in ascii format
+ *
+ */
+void save_matrix
+(
+  const char *file, //output file name
   double *p,        //parameters to be saved
   int nparams       //number of parameters
 );

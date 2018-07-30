@@ -1,43 +1,37 @@
-CFLAGS=-Wall -Wextra  -O3 #-Werror
-LFLAGS=-lm -lpng -ljpeg -ltiff -fopenmp
+CFLAGS=-Wall -Wextra -O3
+LDFLAGS=-lm -lpng -ljpeg -ltiff -lstdc++
 
+SRC1 := bicubic_interpolation.cpp inverse_compositional_algorithm.cpp mask.cpp transformation.cpp file.cpp matrix.cpp zoom.cpp
+SRC2 := iio.c mt19937ar.c
 
-# Recursively get all *.cpp and *.c in this directory and any sub-directories
-SRC1 := $(shell find . -name "*.cpp") 
-SRC2 := $(shell find . -name "*.c") 
-
-INCLUDE = -I. -I./feature_based_motion
+INCLUDE = -I.
 
 #Replace suffix .cpp and .c by .o
 OBJ := $(addsuffix .o,$(basename $(SRC1))) $(addsuffix .o,$(basename $(SRC2)))
 
 #Binary file
-BIN  = main noise output
-DEST = inverse_compositional_algorithm add_noise generate_output
-
-OBJBIN = ./noise.o ./output.o ./main.o
-OBJ1 := $(filter-out $(OBJBIN),$(OBJ))
+BIN  = inverse_compositional_algorithm add_noise generate_output
 
 #All is the target (you would run make all from the command line). 'all' is dependent
-all: $(BIN) 
+all: $(BIN)
 
 #Generate executables
-main: $(OBJ1) main.o
-	g++ -std=c++11 $(OBJ1) main.o -o inverse_compositional_algorithm $(LFLAGS) -lstdc++
+inverse_compositional_algorithm: main.o $(OBJ)
+	$(CXX) -std=c++11 $^ -o $@ $(LDFLAGS)
 
-noise: mt19937ar.o file.o iio.o noise.o
-	g++ -std=c++11 $(OBJ1)  noise.o -o add_noise  $(LFLAGS) -lstdc++
+add_noise: mt19937ar.o file.o iio.o noise.o
+	$(CXX) -std=c++11 $^ -o $@ $(LDFLAGS)
 
-output: output.o file.o iio.o bicubic_interpolation.o inverse_compositional_algorithm.o transformation.o
-	g++ -std=c++11 $(OBJ1)  output.o -o generate_output  $(LFLAGS) -lstdc++
+generate_output: output.o $(OBJ)
+	$(CXX) -std=c++11 $^ -o $@ $(LDFLAGS)
 
 #each object file is dependent on its source file, and whenever make needs to create
 #an object file, to follow this rule:
 %.o: %.c
-	gcc -std=c99  -c $< -o $@ $(INCLUDE) $(CFLAGS) $(LFLAGS)  -Wno-unused -pedantic -DNDEBUG -D_GNU_SOURCE
+	$(CC) -std=c99  -c $< -o $@ $(INCLUDE) $(CFLAGS)  -Wno-unused -pedantic -DNDEBUG -D_GNU_SOURCE
 
 %.o: %.cpp
-	g++ -std=c++11 -c $< -o $@ $(INCLUDE) $(CFLAGS) $(LFLAGS) 
+	$(CXX) -std=c++11 -c $< -o $@ $(INCLUDE) $(CFLAGS)
 
-clean: 
-	rm -f $(OBJ) $(DEST)
+clean:
+	rm -f $(OBJ) $(BIN) main.o output.o noise.o

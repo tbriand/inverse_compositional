@@ -3,7 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
-// Copyright (C) 2017, Thibaud Briand <thibaud.briand@enpc.fr>
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@ulpgc.es>
 // Copyright (C) 2014, Nelson Monzón López <nmonzon@ctim.es>
 // All rights reserved.
@@ -14,17 +14,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "smapa.h"
-SMART_PARAMETER(NANIFOUTSIDE,1) //set boundary pixels values to 0 if 0 and NAN if 1
-SMART_PARAMETER(EDGEPADDING,5)  //control the width of discarded values
-
 /**
   *
   * Neumann boundary condition test
   *
 **/
-int
-neumann_bc (int x, int nx)
+static int
+neumann_bc(
+  int x, //index
+  int nx //size
+)
 {
   if (x<0)
       x = 0;
@@ -33,16 +32,15 @@ neumann_bc (int x, int nx)
   return x;
 }
 
-
 /**
   *
   * Bicubic interpolation in one dimension
   *
 **/
-double
+static double
 cubic_interpolation(
-  double v[4],  //interpolation points
-  double x      //point to be interpolated
+  double v[4], //interpolation points
+  double x     //point to be interpolated
 )
 {
   return v[1] + 0.5 * x * (v[2] - v[0]
@@ -50,13 +48,12 @@ cubic_interpolation(
                                   + x * (3.0 * (v[1] - v[2]) + v[3] - v[0])));
 }
 
-
 /**
   *
   * Bicubic interpolation in two dimension
   *
 **/
-double
+static double
 bicubic_interpolation(
   double p[4][4], //array containing the interpolation points
   double x,       //x position to be interpolated
@@ -79,13 +76,13 @@ bicubic_interpolation(
 **/
 double
 bicubic_interpolation(
-  double *input,//image to be interpolated
-  double uu,    //x component of the vector field
-  double vv,    //y component of the vector field
-  int nx,       //width of the image
-  int ny,       //height of the image
-  int nz,       //number of channels of the image
-  int k         //actual channel
+  double *input, //image to be interpolated
+  double uu,     //x component of the vector field
+  double vv,     //y component of the vector field
+  int nx,        //width of the image
+  int ny,        //height of the image
+  int nz,        //number of channels of the image
+  int k          //actual channel
 )
 {
     int sx = (uu < 0) ? -1 : 1;
@@ -133,8 +130,6 @@ bicubic_interpolation(
     return bicubic_interpolation (pol, (double) uu - x, (double) vv - y);
 }
 
-
-
 /**
   *
   * Compute the bicubic interpolation of an image from a parametric transform
@@ -147,14 +142,13 @@ void bicubic_interpolation(
   int nparams,     //number of parameters of the transform
   int nx,          //width of the image
   int ny,          //height of the image
-  int nz           //number of channels of the image
+  int nz,          //number of channels of the image
+  int delta,       //distance to the boundary
+  int nanifoutside //parameter for discarding boudary pixels
 )
 {
-  double out_value = 0;
-  if ( NANIFOUTSIDE() )
-      out_value = NAN;
-  int delta = EDGEPADDING();
-  
+  double out_value = ( nanifoutside ) ? NAN : 0;
+
   for (int i=0; i<ny; i++)
     for (int j=0; j<nx; j++) {
       int p=i*nx+j;

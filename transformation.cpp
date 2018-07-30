@@ -3,6 +3,7 @@
 // copy of this license along this program. If not, see
 // <http://www.opensource.org/licenses/bsd-license.html>.
 //
+// Copyright (C) 2018, Thibaud Briand <thibaud.briand@enpc.fr>
 // Copyright (C) 2015, Javier Sánchez Pérez <jsanchez@dis.ulpgc.es>
 // All rights reserved.
 
@@ -22,11 +23,11 @@ void jacobian
   int nparams, //number of parameters
   int nx,      //number of columns of the image
   int ny       //number of rows of the image
-) 
+)
 {
-  switch(nparams) 
+  switch(nparams)
   {
-    default: case TRANSLATION_TRANSFORM:  //p=(tx, ty) 
+    default: case TRANSLATION_TRANSFORM:  //p=(tx, ty)
       for(int i=0; i<nx*ny; i++)
       {
         int c=2*i*nparams;
@@ -34,13 +35,13 @@ void jacobian
         J[c+2]=0.0; J[c+3]=1.0;
       }
       break;
-    case EUCLIDEAN_TRANSFORM:  //p=(tx, ty, tita)
+    case EUCLIDEAN_TRANSFORM:  //p=(tx, ty, theta)
       for(int i=0; i<ny; i++)
         for(int j=0; j<nx; j++)
         {
           int c=2*(i*nx+j)*nparams;
-          J[c]  =1.0; J[c+1]=0.0; J[c+2]=-i; 
-          J[c+3]=0.0; J[c+4]=1.0; J[c+5]= j; 
+          J[c]  =1.0; J[c+1]=0.0; J[c+2]=-i;
+          J[c+3]=0.0; J[c+4]=1.0; J[c+5]= j;
         }
       break;
     case SIMILARITY_TRANSFORM: //p=(tx, ty, a, b)
@@ -60,16 +61,16 @@ void jacobian
           J[c]  =1.0;J[c+1]=0.0;J[c+2]=  j;J[c+3]=  i;J[c+ 4]=0.0;J[c+ 5]=0.0;
           J[c+6]=0.0;J[c+7]=1.0;J[c+8]=0.0;J[c+9]=0.0;J[c+10]=  j;J[c+11]=  i;
         }
-      break;    
+      break;
     case HOMOGRAPHY_TRANSFORM: //p=(h00, h01,..., h21)
       for(int i=0; i<ny; i++)
         for(int j=0; j<nx; j++)
         {
           int c=2*(i*nx+j)*nparams;
-          J[c]  =  j; J[c+1]=  i; J[c+2]=1.0;  J[c+3]=0.0; 
+          J[c]  =  j; J[c+1]=  i; J[c+2]=1.0;  J[c+3]=0.0;
           J[c+4]=0.0; J[c+5]=0.0; J[c+6]=-j*j; J[c+7]=-j*i;
-          
-          J[c+8]=0.0; J[c+9] =0.0; J[c+10]= 0.0; J[c+11]=   j; 
+
+          J[c+8]=0.0; J[c+9] =0.0; J[c+10]= 0.0; J[c+11]=   j;
           J[c+12]= i; J[c+13]=1.0; J[c+14]=-j*i; J[c+15]=-i*i;
         }
       break;
@@ -89,10 +90,10 @@ void update_transform
   int nparams //number of parameters
 )
 {
-  switch(nparams) 
+  switch(nparams)
   {
     default: case TRANSLATION_TRANSFORM: //p=(tx, ty)+++
-      for(int i = 0; i < nparams; i++) 
+      for(int i = 0; i < nparams; i++)
         p[i]-=dp[i];
       break;
     case EUCLIDEAN_TRANSFORM: //p=(tx, ty, tita)
@@ -109,7 +110,7 @@ void update_transform
       double sint=a*bp-b*ap;
       p[0]=cp-bp*(b*c-a*d)-ap*(a*c+b*d);
       p[1]=dp-bp*(a*c+b*d)+ap*(b*c-a*d);
-      p[2]=atan2(sint,cost);   
+      p[2]=atan2(sint,cost);
     }
     break;
     case SIMILARITY_TRANSFORM: //p=(tx, ty, a, b)
@@ -125,7 +126,7 @@ void update_transform
         double bp=p[3];
         double cp=p[0];
         double dp=p[1];
-        
+
         p[0]=cp-bp*(-d-a*d+b*c)/det+(ap+1)*(-c-a*c-b*d)/det;
         p[1]=dp+bp*(-c-a*c-b*d)/det+(ap+1)*(-d-a*d+b*c)/det;
         p[2]=b*bp/det+(a+1)*(ap+1)/det-1;
@@ -150,13 +151,13 @@ void update_transform
         double dp=p[4];
         double ep=p[5];
         double fp=p[1];
-        
+
         p[0]=cp+(-f*bp-a*f*bp+c*d*bp)/det+(ap+1)*(-c+b*f-c*e)/det;
         p[1]=fp+dp*(-c+b*f-c*e)/det+(-f+c*d-a*f-f*ep-a*f*ep+d*d*ep)/det;
         p[2]=((1+ap)*(1+e)-d*bp)/det-1;
         p[3]=(bp+a*bp-b-b*ap)/det;
         p[4]=(dp*(1+e)-d-d*ep)/det;
-        p[5]=(a+ep+a*ep+1-b*dp)/det-1; 
+        p[5]=(a+ep+a*ep+1-b*dp)/det-1;
       }
     }
     break;
@@ -178,7 +179,7 @@ void update_transform
       double fp=p[5];
       double gp=p[6];
       double hp=p[7];
-        
+
       double det=f*hp+a*f*hp-c*d*hp+gp*(c-b*f+c*e)-a+b*d-e-a*e-1;
       if(det*det>1E-10)
       {
@@ -189,13 +190,12 @@ void update_transform
         p[4]=(b*dp-c*h*dp+h*fp+a*h*fp-b*g*fp-a+c*g-ep-a*ep+c*g*ep-1)/det-1;
         p[5]=(dp*(c-b*f+c*e)+f+a*f-c*d+f*ep+a*f*ep-c*d*ep+fp*(-a+b*d-e-a*e-1))/det;
         p[6]=(d*hp-f*g*hp+g-d*h+g*e+gp*(f*h-e-1))/det;
-        p[7]=(h+a*h-b*g+b*gp-c*h*gp-hp-a*hp+c*g*hp)/det;          
+        p[7]=(h+a*h-b*g+b*gp-c*h*gp-hp-a*hp+c*g*hp)/det;
       }
     }
     break;
   }
 }
-
 
 /**
  *
@@ -213,7 +213,7 @@ void project
 )
 {
   switch(nparams) {
-    default: case TRANSLATION_TRANSFORM: //p=(tx, ty) 
+    default: case TRANSLATION_TRANSFORM: //p=(tx, ty)
       xp=x+p[0];
       yp=y+p[1];
       break;
@@ -253,7 +253,7 @@ void params2matrix
   matrix[1]=matrix[2]=matrix[3]=0;
   matrix[5]=matrix[6]=matrix[7]=0;
   switch(nparams) {
-    default: case TRANSLATION_TRANSFORM: //p=(tx, ty) 
+    default: case TRANSLATION_TRANSFORM: //p=(tx, ty)
       matrix[2]=p[0];
       matrix[5]=p[1];
       break;
@@ -291,6 +291,5 @@ void params2matrix
       matrix[6]=p[6];
       matrix[7]=p[7];
       break;
-    
   }
 }
