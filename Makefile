@@ -10,7 +10,7 @@ INCLUDE = -I.
 OBJ := $(addsuffix .o,$(basename $(SRC1))) $(addsuffix .o,$(basename $(SRC2)))
 
 #Binary file
-BIN  = inverse_compositional_algorithm add_noise generate_output
+BIN  = inverse_compositional_algorithm add_noise generate_output equalization
 
 #All is the target (you would run make all from the command line). 'all' is dependent
 all: $(BIN)
@@ -24,6 +24,9 @@ add_noise: mt19937ar.o file.o iio.o noise.o
 
 generate_output: output.o $(OBJ)
 	$(CXX) -std=c++11 $^ -o $@ $(LDFLAGS)
+	
+equalization: equalization.o iio.o
+	$(CC) -std=c99 $^ -o $@ $(LDFLAGS)
 
 #each object file is dependent on its source file, and whenever make needs to create
 #an object file, to follow this rule:
@@ -34,4 +37,4 @@ generate_output: output.o $(OBJ)
 	$(CXX) -std=c++11 -c $< -o $@ $(INCLUDE) $(CFLAGS)
 
 clean:
-	rm -f $(OBJ) $(BIN) main.o output.o noise.o
+	rm -f $(OBJ) $(BIN) main.o output.o noise.o equalization.o
