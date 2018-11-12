@@ -242,3 +242,22 @@ void save
   fprintf(fd,"\n");
   fclose(fd);
 }
+
+/**
+ *
+ *  Function to save the parameters in ascii format
+ *
+ */
+void save_matrix
+(
+  const char *file, //output file name
+  double *p,        //parameters to be saved
+  int nparams       //number of parameters
+)
+{
+  FILE *fd=fopen(file,"w");
+  for(int j=0; j<nparams; j++)
+    fprintf(fd,"%.14lg ", p[j]);
+  fprintf(fd,"\n");
+  fclose(fd);
+}

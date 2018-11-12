@@ -26,7 +26,7 @@ opt=${18}
 
 TIMEFORMAT="%U"
 
-echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
+#echo "graymethod $GRAYMETHOD save $SAVE first_scale ${FIRST_SCALE} edge ${EDGEPADDING} gradient ${ROBUST_GRADIENT} robust ${ROBUST} nanifoutside ${NANIFOUTSIDE}"
 basefile=graymethod${GRAYMETHOD}_save${SAVE}_scale${FIRST_SCALE}_edge${EDGEPADDING}_nan${NANIFOUTSIDE}_gradient${ROBUST_GRADIENT}_robust${ROBUST}
 regpat_ica=ica_${basefile}_%i.hom
 time_ica=time_ica_${basefile}.txt
@@ -41,7 +41,7 @@ if [ ! -s $time_ica ]; then
         REGi=`printf $regpat_ica $i`
         # TEST
         #cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $REF $INi -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
-        cmd="GRAYMETHOD=$GRAYMETHOD SAVELONGER=$SAVE EDGEPADDING=$EDGEPADDING NANIFOUTSIDE=$NANIFOUTSIDE ROBUST_GRADIENT=$ROBUST_GRADIENT inverse_compositional_algorithm $INi $REF -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE"
+        cmd="inverse_compositional_algorithm $INi $REF -f $REGi -n $SCALES -r $ROBUST -e $PRECISION -t $transform -s $FIRST_SCALE -c $GRAYMETHOD -d $EDGEPADDING -p $NANIFOUTSIDE -g $ROBUST_GRADIENT"
         # END TEST
         echo "$cmd"
     done | parallel -j $NTHREADS &> /dev/null; } 2> $time_ica
@@ -51,8 +51,11 @@ if [ ! -s $time_ica ]; then
         REGICAi=`printf $regpat_ica $i`
         REGi=`printf $TRUE_REGPAT $i`
         FIELDi=`printf $field_ica $i`
-        compare_homography $w $h "`cat $REGICAi`" "`cat $REGi`" $FIELDi $opt
-        compute mean 0 $FIELDi >> $rmse_ica
-        rm $FIELDi $REGICAi
-    done
+        homo1=`echo $(cat $REGICAi)`
+        homo2=`echo $(cat $REGi)`
+        cmd="compare_homography $w $h \"$homo1\" \"$homo2\" $FIELDi $opt"
+        cmd="$cmd; compute mean 0 $FIELDi"
+        cmd="$cmd; rm $FIELDi $REGICAi"
+        echo "$cmd"
+    done  | parallel -j 7 >> $rmse_ica
 fi

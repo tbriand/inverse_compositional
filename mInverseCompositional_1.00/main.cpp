@@ -15,6 +15,7 @@
 #include <algorithm>
 #include "inverse_compositional_algorithm.h"
 #include "file.h"
+#include "transformation.h"
 
 #define PAR_DEFAULT_NSCALES 0
 #define PAR_DEFAULT_ZFACTOR 0.5
@@ -29,6 +30,7 @@
 #define PAR_DEFAULT_DELTA 5
 #define PAR_DEFAULT_NANIFOUTSIDE 1
 #define PAR_DEFAULT_TYPE_GRADIENT 3
+#define PAR_DEFAULT_OUTPUT 0
 
 /**
  *
@@ -46,6 +48,10 @@ void print_help(char *name)
   printf(" -f name \t Name of the output filename that will contain the\n");
   printf("         \t   computed transformation\n");
   printf("         \t   Default value %s\n", PAR_DEFAULT_OUTFILE);
+  printf(" -o N    \t Output transformation format: \n");
+  printf("         \t   0-Parametrization\n");
+  printf("         \t   1-3x3 Projective matrix\n");
+  printf("         \t   Default value %d\n", PAR_DEFAULT_OUTPUT);
   printf(" -n N    \t Number of scales for the coarse-to-fine scheme\n");
   printf("         \t   Default value %d\n", PAR_DEFAULT_NSCALES);
   printf(" -z F    \t Zoom factor used in the coarse-to-fine scheme\n");
@@ -108,7 +114,8 @@ int read_parameters(
     int    &graymethod,
     int    &delta,
     int    &nanifoutside,
-    int    &type_gradient
+    int    &type_gradient,
+    int    &type_output
 )
 {
   if (argc < 3){
@@ -134,6 +141,7 @@ int read_parameters(
     delta        =PAR_DEFAULT_DELTA;
     nanifoutside =PAR_DEFAULT_NANIFOUTSIDE;
     type_gradient=PAR_DEFAULT_TYPE_GRADIENT;
+    type_output  =PAR_DEFAULT_OUTPUT;
 
     //read each parameter from the command line
     while(i<argc)
@@ -186,6 +194,10 @@ int read_parameters(
         if(i<argc-1)
           type_gradient=atoi(argv[++i]);
 
+      if(strcmp(argv[i],"-o")==0)
+        if(i<argc-1)
+          type_output=atoi(argv[++i]);
+
       if(strcmp(argv[i],"-v")==0)
         verbose=1;
 
@@ -211,6 +223,8 @@ int read_parameters(
         graymethod=PAR_DEFAULT_GRAYMETHOD;
     if(type_gradient<0 || type_gradient>5)
         type_gradient=PAR_DEFAULT_TYPE_GRADIENT;
+    if(type_output<0 || type_output>1)
+        type_output  =PAR_DEFAULT_OUTPUT;
   }
 
   return 1;
@@ -269,14 +283,14 @@ int main (int argc, char *argv[])
   //parameters of the method
   char  *image1, *image2, outfile[200];
   int    nscales, nparams, robust, verbose, first_scale, graymethod;
-  int    delta, nanifoutside, type_gradient;
+  int    delta, nanifoutside, type_gradient, type_output;
   double zfactor, TOL, lambda;
 
   //read the parameters from the console
   int result=read_parameters(
         argc, argv, &image1, &image2, outfile, nscales,
         zfactor, TOL, nparams, robust, lambda, verbose, first_scale,
-        graymethod, delta, nanifoutside, type_gradient
+        graymethod, delta, nanifoutside, type_gradient, type_output
       );
 
   if(result)
@@ -300,9 +314,10 @@ int main (int argc, char *argv[])
         printf(
           "\nParameters: scales=%d, zoom=%f, TOL=%f, transform type=%d, "
           "robust function=%d, lambda=%f, output file=%s, delta=%d, "
-          "nanifoutside=%d, graymethod=%d, first scale=%d, gradient type=%d\n",
+          "nanifoutside=%d, graymethod=%d, first scale=%d, gradient type=%d, "
+          "type output=%d\n",
           nscales, zfactor, TOL, nparams, robust, lambda, outfile, delta,
-          nanifoutside, graymethod, first_scale, type_gradient
+          nanifoutside, graymethod, first_scale, type_gradient, type_output
         );
 
       //allocate memory for the parametric model
@@ -352,7 +367,18 @@ int main (int argc, char *argv[])
       }
 
       //save the parametric model to disk
-      save(outfile, p, nparams);
+      if(type_output) {
+        double mat[9];
+        params2matrix(p, mat, nparams);
+        save_matrix(outfile, mat, 9);
+        if(verbose) {
+          printf("Transform: ");
+          for(int j=0; j<9; j++) printf("%.14lg ", mat[j]);
+          printf("\n");
+        }
+      }
+      else
+        save(outfile, p, nparams);
 
       //free memory
       delete[]p;

@@ -86,6 +86,10 @@ accompanying IPOL article. Usage instructions:
 	 -f name         Name of the output filename that will contain the
 		           computed transformation
 		           Default value transform.mat
+         -o N            Output transformation format: 
+                           0-Parametrization
+                           1-3x3 Projective matrix
+                           Default value 0
 	 -n N            Number of scales for the coarse-to-fine scheme
 		           Default value 0
 	 -z F            Zoom factor used in the coarse-to-fine scheme

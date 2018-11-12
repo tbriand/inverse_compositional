@@ -143,4 +143,16 @@ void save
   int nparams       //number of parameters
 );
 
+/**
+ *
+ *  Function to save the parameters in ascii format
+ *
+ */
+void save_matrix
+(
+  const char *file, //output file name
+  double *p,        //parameters to be saved
+  int nparams       //number of parameters
+);
+
 #endif
